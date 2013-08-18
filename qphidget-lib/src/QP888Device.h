@@ -54,7 +54,7 @@ public:
     }
 
 signals:
-    void connectedChanged();
+    void connectedChanged(bool connected);
     void phidgetChanged();
 
 public slots:

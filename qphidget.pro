@@ -13,6 +13,17 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
+DESTDIR      = $${OUT_PWD}
+
+CONFIG(debug) {
+    CONFIGURATION = debug
+} else {
+    CONFIGURATION = release
+}
+
+QPHIDGET_LIB_BUILD_PATH = $$PWD/qphidget-lib/$${CONFIGURATION}
+QPHIDGET_QML_BUILD_PATH = $$PWD/qphidget-qml/$${CONFIGURATION}
+
 # Phidget library
 macx:unix {
     LIBS += phidget21
@@ -27,30 +38,30 @@ win32 {
 
 #QPhidget library
 unix {
-    CONFIG(debug) {
-        LIBS += "$$PWD/qphidget-lib/debug/qphidget-lib.so"
-    } else {
-        LIBS += "$$PWD/qphidget-lib/release/qphidget-lib.so"
-    }
+    QPHIDGET_LIB = $${QPHIDGET_LIB_BUILD_PATH}/qphidget-lib.so
+    LIBS += "$${QPHIDGET_LIB}"
 }
 win32 {
+    QPHIDGET_LIB = $$QPHIDGET_LIB_BUILD_PATH/qphidget-lib.lib
     CONFIG(debug) {
-        LIBS += "$$PWD/qphidget-lib/debug/qphidget-lib.lib"
+        QPHIDGET_QML = $${QPHIDGET_QML_BUILD_PATH}/qphidget-qmld.lib
     } else {
-        LIBS += "$$PWD/qphidget-lib/release/qphidget-lib.lib"
+        QPHIDGET_QML = $${QPHIDGET_QML_BUILD_PATH}/qphidget-qml.lib
     }
+    LIBS += "$${QPHIDGET_LIB}" "$${QPHIDGET_QML}"
 }
 
-INCLUDEPATH += qphidget-lib/src
-HEADERS += $$PWD/qphidget-lib/src/*.h
+INCLUDEPATH += {$$PWD}/qphidget-lib/src {$$PWD}//qphidget-qml
+HEADERS += {$$PWD}/qphidget-lib/src/*.h {$$PWD}/qphidget-lib/*.h
 
 # Add more folders to ship with the application, here
-folder_01.source = qml/qphidget
-folder_01.target = qml
-DEPLOYMENTFOLDERS = folder_01
+folderQml.source = qml/qphidget
+folderQml.target = qml
+folderLibQPhidget = ../qphidget-lib
+DEPLOYMENTFOLDERS = folderQml
 
 # Additional import path used to resolve QML modules in Creator's code model
-QML_IMPORT_PATH =
+QML_IMPORT_PATH += qphidget-qml/$${CONFIGURATION}
 
 # If your application uses the Qt Mobility libraries, uncomment the following
 # lines and add the respective components to the MOBILITY variable.
@@ -78,3 +89,21 @@ win32 {
 
 # HEADERS +=
 
+# Deployment
+
+OTHER_FILES += \
+        $${QPHIDGET_LIB} \
+        $${QPHIDGET_QML} \
+        $${QPHIDGET_QML_BUILD_PATH}/../qmldir
+
+win32 {
+    #...
+
+    OTHER_FILES_WIN = $${OTHER_FILES}
+    OTHER_FILES_WIN ~= s,/,\\,g
+    DESTDIR_WIN = $${DESTDIR}
+    DESTDIR_WIN ~= s,/,\\,g
+    for(FILE,OTHER_FILES_WIN){
+        QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${FILE} $${DESTDIR_WIN}$$escape_expand(\n\t))
+    }
+}

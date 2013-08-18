@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import com.soapbubble.qphidget 1.0
 
 Rectangle {
     width: 360
@@ -10,7 +11,15 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            Qt.quit();
+            ifk.output0 = !ifk.output0;
+        }
+    }
+
+
+    IFK888 {
+        id: ifk
+        onInput0Changed: {
+            console.log('Input0: ' + state)
         }
     }
 }

@@ -71,6 +71,10 @@ int CPhidget_enableLogging (CPhidgetLog_level level, const char *outputFile);
 int CPhidget_open (CPhidgetHandle phid, int serialNumber);
 int CPhidget_close (CPhidgetHandle phid);
 int CPhidget_delete (CPhidgetHandle phid);
+int CPhidget_set_OnDetach_Handler (CPhidgetHandle phid, int (__stdcall * fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
+int CPhidget_set_OnAttach_Handler (CPhidgetHandle phid, int (__stdcall * fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
+
+
 
 int CPhidgetManager_create (CPhidgetManagerHandle * phidm);
 int CPhidgetManager_open (CPhidgetManagerHandle phidm);
@@ -92,6 +96,7 @@ class QPMock888Device;
 typedef QPMock888Device *CPhidgetInterfaceKitHandle;
 
 int CPhidgetInterfaceKit_create (CPhidgetInterfaceKitHandle * phid);
+int CPhidgetInterfaceKit_setOutputState (CPhidgetInterfaceKitHandle phid, int index, int outputState);
 int CPhidgetInterfaceKit_set_OnInputChange_Handler (CPhidgetInterfaceKitHandle phid, int (__stdcall * fptr) (CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState),
                                 void *userPtr);
 

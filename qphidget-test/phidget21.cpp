@@ -132,3 +132,22 @@ int CPhidgetInterfaceKit_set_OnInputChange_Handler(CPhidgetInterfaceKitHandle ph
     return 0;
 }
 
+
+int CPhidgetInterfaceKit_setOutputState(CPhidgetInterfaceKitHandle phid, int index, int outputState)
+{
+    return phid->setOutput(index, outputState);
+}
+
+
+int CPhidget_set_OnDetach_Handler(CPhidgetHandle phid, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
+{
+    // TODO: Implement mock
+    return 0;
+}
+
+
+int CPhidget_set_OnAttach_Handler(CPhidgetHandle phid, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
+{
+    // TODO: Implement mock
+    return 0;
+}

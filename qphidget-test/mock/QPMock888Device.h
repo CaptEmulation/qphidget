@@ -31,6 +31,7 @@ public:
     
     int setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr);
     int setInput(int index, bool input);
+    int setOutput(int index, bool output);
 
 signals:
     

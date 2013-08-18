@@ -17,6 +17,8 @@ limitations under the License.
 #include "QP888Device.h"
 
 int inputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState);
+int attachHandler(CPhidgetHandle phid, void *userPtr);
+int detachHandler(CPhidgetHandle phid, void *userPtr);
 
 class QP888DevicePrivate
 {
@@ -30,6 +32,8 @@ public:
     QList<QPDigitalIO *> mOutputs;
 
     void initialize() {
+        mPhidget = Q_NULLPTR;
+
         // Initialize individual IO objects
         for(int i = 0; i < 8; i++) {
             mInputs.append(new QPDigitalIO(QPDigitalIO::Input, i, self));
@@ -39,16 +43,22 @@ public:
     }
 
     void open() {
-        if (mConnected) {
-            int err = CPhidgetInterfaceKit_create(&mIfkPhidget);
-            err = CPhidgetInterfaceKit_set_OnInputChange_Handler(mIfkPhidget, inputHandler, this);
-            err = CPhidget_open((CPhidgetHandle)mIfkPhidget, -1);
-            mOpen = !err;
+        int err = CPhidgetInterfaceKit_create(&mIfkPhidget);
+
+        if (mPhidget == Q_NULLPTR) {
+            setPhidget((CPhidgetHandle)mIfkPhidget);
         }
+
+        err = CPhidget_set_OnAttach_Handler((CPhidgetHandle)mIfkPhidget, attachHandler, this);
+        err = CPhidget_set_OnDetach_Handler((CPhidgetHandle)mIfkPhidget, detachHandler, this);
+        err = CPhidgetInterfaceKit_set_OnInputChange_Handler(mIfkPhidget, inputHandler, this);
+        err = CPhidget_open((CPhidgetHandle)mIfkPhidget, -1);
+        mOpen = !err;
     }
 
     void close() {
-         CPhidget_close((CPhidgetHandle)mIfkPhidget);
+        setConnected(false);
+        CPhidget_close((CPhidgetHandle)mIfkPhidget);
     }
 
     void setPhidget(CPhidgetHandle phidget) {
@@ -60,7 +70,18 @@ public:
     void setConnected(bool connected) {
         if (connected != mConnected) {
             mConnected = connected;
-            emit self->connectedChanged();
+            if (connected) {
+                // Inform output digits about IFk handler so that they can post there changes
+                foreach(QPDigitalIO *output, mOutputs) {
+                    output->setIfk(mIfkPhidget);
+                }
+            } else {
+                // Turn off phidget posting of outputs
+                foreach(QPDigitalIO *output, mOutputs) {
+                    output->setIfk(Q_NULLPTR);
+                }
+            }
+            emit self->connectedChanged(connected);
         }
     }
 
@@ -87,6 +108,7 @@ QP888Device::QP888Device(QObject *parent) :
 
 QP888Device::~QP888Device()
 {
+    CPhidget_close((CPhidgetHandle)p->mIfkPhidget);
     CPhidget_delete((CPhidgetHandle)p->mIfkPhidget);
 }
 
@@ -148,3 +170,14 @@ int inputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int 
     return 0;
 }
 
+int attachHandler(CPhidgetHandle phid, void *userPtr) {
+    QP888DevicePrivate *instance = (QP888DevicePrivate *)userPtr;
+    instance->setConnected(true);
+    return 0;
+}
+
+int detachHandler(CPhidgetHandle phid, void *userPtr) {
+    QP888DevicePrivate *instance = (QP888DevicePrivate *)userPtr;
+    instance->setConnected(false);
+    return 0;
+}

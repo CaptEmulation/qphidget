@@ -60,6 +60,17 @@ public:
         }
         return 0;
     }
+
+    int setOutput(int index, bool output) {
+        if (output) {
+            mOutput |= output << index;
+        } else {
+            mOutput &= output << index;
+        }
+
+        // TODO: create and notify listeners
+        return 0;
+    }
 };
 
 QPMock888Device::QPMock888Device(QObject *parent) :
@@ -80,4 +91,9 @@ int QPMock888Device::setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, vo
 int QPMock888Device::setInput(int index, bool input)
 {
     return p->setInput(index, input);
+}
+
+int QPMock888Device::setOutput(int index, bool output)
+{
+    return p->setOutput(index, output);
 }

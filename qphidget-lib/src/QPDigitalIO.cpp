@@ -25,6 +25,7 @@ public:
     bool mState;
     QPDigitalIO::Type mType;
     qint32 mIndex;
+    CPhidgetInterfaceKitHandle mIfk;
 
     bool state() {
         return mState;
@@ -33,7 +34,17 @@ public:
     void setState(bool state) {
         if (state != mState) {
             mState = state;
+            if (mIfk && mType == QPDigitalIO::Output) {
+                CPhidgetInterfaceKit_setOutputState(mIfk, mIndex, state);
+            }
             emit self->stateChanged(state);
+        }
+    }
+
+    void setIfk(CPhidgetInterfaceKitHandle ifk) {
+        if (mIfk != ifk) {
+            mIfk = ifk;
+            emit self->ifkChanged(ifk);
         }
     }
 };
@@ -46,6 +57,7 @@ QPDigitalIO::QPDigitalIO(Type type, qint32 index, QObject *parent) :
     p->mState = false;
     p->mType = type;
     p->mIndex = index;
+    p->mIfk = Q_NULLPTR;
 }
 
 QPDigitalIO::~QPDigitalIO()
@@ -57,10 +69,20 @@ bool QPDigitalIO::state()
     return p->state();
 }
 
+CPhidgetInterfaceKitHandle QPDigitalIO::ifk()
+{
+    return p->mIfk;
+}
+
 
 void QPDigitalIO::setState(bool state)
 {
     p->setState(state);
+}
+
+void QPDigitalIO::setIfk(CPhidgetInterfaceKitHandle ifk)
+{
+    p->setIfk(ifk);
 }
 
 

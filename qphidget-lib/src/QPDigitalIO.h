@@ -19,6 +19,7 @@ limitations under the License.
 #define QPDIGITALINPUT_H
 
 #include <QObject>
+#include "phidget21.h"
 
 class QPDigitalIOPrivate;
 
@@ -26,6 +27,7 @@ class QPDigitalIO : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool state READ state WRITE setState NOTIFY stateChanged)
+    Q_PROPERTY(CPhidgetInterfaceKitHandle ifk READ ifk WRITE setIfk NOTIFY ifkChanged)
 
 public:
     enum Type {
@@ -37,13 +39,16 @@ public:
     ~QPDigitalIO();
 
     bool state();
+    CPhidgetInterfaceKitHandle ifk();
 signals:
 
     void stateChanged(bool state);
+    void ifkChanged(CPhidgetInterfaceKitHandle ifk);
 
 public slots:
 
     void setState(bool state);
+    void setIfk(CPhidgetInterfaceKitHandle ifk);
 
 private:
     QScopedPointer<QPDigitalIOPrivate> p;
