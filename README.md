@@ -23,6 +23,8 @@ interfaceKit->open();
 
 ### From QML
 ```
+import com.soapbubble.qphidget 1.0
+
 Rectangle {
   width: 360
   height: 360
@@ -32,14 +34,16 @@ Rectangle {
           ifk.output0 = !ifk.output0;
       }
   }
-}
-
-IFK888 { // QML Item for InterfaceKit 8/8/8
+  
+  IFK888 { // QML Item for InterfaceKit 8/8/8
     id: ifk
     onInput0Changed: {
         console.log('Input0: ' + state)
     }
+  }
 }
+
+
 ```
 
 ## Building
