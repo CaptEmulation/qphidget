@@ -1,0 +1,4 @@
+qphidget
+========
+
+Qt Phidget API
