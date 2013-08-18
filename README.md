@@ -1,5 +1,6 @@
 # QPhidget
 
+Phidgets are a collection of USB powered DAIO (Digital/Analog Input/Output) devices rangings from general purpose input/output to specialized modules such as motor control, motion, environment, touch and eletrical sensors.  This project currently supports the basic InterfaceKit module.
 
 ## Qt Phidget API
 Implementation of the Phidget API exposed as QtObjects
