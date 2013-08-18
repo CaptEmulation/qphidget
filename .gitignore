@@ -9,6 +9,13 @@
 *.so
 *.dll
 *.dylib
+*.obj
+*.pdb
+*.manifest
+*.rc
+*.res
+*.ilk
+*.lib
 
 # Qt-es
 
@@ -16,5 +23,6 @@
 *.pro.user.*
 moc_*.cpp
 qrc_*.cpp
-Makefile
+Makefile*
 *-build-*
+

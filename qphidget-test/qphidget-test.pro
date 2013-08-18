@@ -12,6 +12,7 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
+# Qt Config
 
 QT       += testlib
 
@@ -23,29 +24,26 @@ CONFIG   -= app_bundle
 
 TEMPLATE = app
 
+#QPhidget library will be rebuilt from sources linked against the test mock library
+
+INCLUDEPATH += $$PWD/../qphidget-lib/src
+HEADERS += $$PWD/../qphidget-lib/src/*.h
+SOURCES += $$PWD/../qphidget-lib/src/*.cpp
+
+# Test Sources
 
 SOURCES += tst_Phidget.cpp \
     phidget21.cpp \
     mock/QPMock.cpp \
     mock/QPMock888Device.cpp \
     mock/QPMockDevice.cpp
+
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
-INCLUDEPATH += . ../src mock
-
-SOURCES += \
-    ../src/QPInterfaceKitFactory.cpp \
-    ../src/QPDevice888.cpp \
-    ../src/QPManager.cpp \
-    ../src/QPDigitalIO.cpp
-
+INCLUDEPATH += . mock
 
 HEADERS += \
     phidget21.h \
-    ../src/QPInterfaceKitFactory.h \
-    ../src/QPDevice888.h \
-    ../src/QPManager.h \
-    ../src/QPDigitalIO.h \
     mock/QPMock.h \
     mock/QPMock888Device.h \
     mock/QPMockDevice.h

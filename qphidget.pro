@@ -13,16 +13,36 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-
-
-#Phidget library
-macx {
+# Phidget library
+macx:unix {
     LIBS += phidget21
 }
 
 win32 {
-    win32:LIBS += "C:/Program Files/Phidgets/phidget21.lib"
+    LIBS += "C:/Program Files/Phidgets/phidget21.lib"
+    INCLUDEPATH += "C:/Program Files/Phidgets"
+    HEADERS += "C:/Program Files/Phidgets/phidget21.h"
 }
+
+
+#QPhidget library
+unix {
+    CONFIG(debug) {
+        LIBS += "$$PWD/qphidget-lib/debug/qphidget-lib.so"
+    } else {
+        LIBS += "$$PWD/qphidget-lib/release/qphidget-lib.so"
+    }
+}
+win32 {
+    CONFIG(debug) {
+        LIBS += "$$PWD/qphidget-lib/debug/qphidget-lib.lib"
+    } else {
+        LIBS += "$$PWD/qphidget-lib/release/qphidget-lib.lib"
+    }
+}
+
+INCLUDEPATH += qphidget-lib/src
+HEADERS += $$PWD/qphidget-lib/src/*.h
 
 # Add more folders to ship with the application, here
 folder_01.source = qml/qphidget
@@ -47,11 +67,7 @@ qtcAddDeployment()
 
 
 SOURCES += \
-    main.cpp \
-    src/QPInterfaceKitFactory.cpp \
-    src/QPDevice888.cpp \
-    src/QPManager.cpp \
-    src/QPDigitalIO.cpp \
+    main.cpp
 
 INCLUDEPATH += src
 
@@ -60,10 +76,5 @@ win32 {
         "C:/Program Files/Phidgets"
 }
 
-HEADERS += \
-    src/QPDevice888.h \
-    src/QPManager.h \
-    src/QPDigitalIO.h \
-    src/QPInterfaceKitFactory.h \
-    "C:/Program Files/Phidgets/phidget21.h"
+# HEADERS +=
 
