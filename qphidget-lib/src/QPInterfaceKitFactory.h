@@ -21,7 +21,7 @@ limitations under the License.
 #include <QObject>
 
 #include "QPManager.h"
-#include "QPDevice888.h"
+#include "QP888Device.h"
 
 class QPInterfaceKitFactoryPrivate;
 
@@ -43,11 +43,11 @@ public:
 
     Q_INVOKABLE void createDeviceForHandle(CPhidgetHandle phidget);
 
-    QPDevice888 *getDevice();
+    QP888Device *getDevice();
     
 signals:
     
-    void deviceAvailable(QPDevice888 *device);
+    void deviceAvailable(QP888Device *device);
 public slots:
     
 

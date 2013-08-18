@@ -23,17 +23,17 @@ class QPInterfaceKitFactoryPrivate
 {
 public:
     QPInterfaceKitFactory *self;
-    QMap<CPhidgetHandle, QPDevice888 *> mDevices;
-    QPDevice888 *mLast;
+    QMap<CPhidgetHandle, QP888Device *> mDevices;
+    QP888Device *mLast;
 
     void createDeviceForHandle(CPhidgetHandle phidget) {
         if (mDevices.contains(phidget)) {
-            QPDevice888 *device = mDevices.value(phidget);
+            QP888Device *device = mDevices.value(phidget);
             if (!device->connected()) {
                 device->setConnected(true);
             }
         } else {
-            QPDevice888 *device = new QPDevice888();
+            QP888Device *device = new QP888Device();
             device->moveToThread(self->thread());
             mDevices.insert(phidget, device);
             device->setPhidget(phidget);
@@ -50,7 +50,7 @@ public:
 
     void deviceDetached(CPhidgetHandle phidget) {
         if (mDevices.contains(phidget)) {
-            QPDevice888 *device = mDevices.value(phidget);
+            QP888Device *device = mDevices.value(phidget);
             device->setConnected(false);
         }
     }
@@ -83,7 +83,7 @@ void QPInterfaceKitFactory::createDeviceForHandle(CPhidgetHandle handle)
     p->createDeviceForHandle(handle);
 }
 
-QPDevice888 *QPInterfaceKitFactory::getDevice()
+QP888Device *QPInterfaceKitFactory::getDevice()
 {
     return p->mLast;
 }

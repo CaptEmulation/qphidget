@@ -1,7 +1,3 @@
-#ifndef QPDEVICE888_H
-#define QPDEVICE888_H
-
-#include <QObject>
 /**
 Copyright 2013 John Dean, III
 
@@ -19,12 +15,17 @@ limitations under the License.
 */
 
 
+#ifndef QPDEVICE888_H
+#define QPDEVICE888_H
+
+#include <QObject>
+
 #include "QPDigitalIO.h"
 #include "QPManager.h"
 
-class QPDevice888Private;
+class QP888DevicePrivate;
 
-class QPDevice888 : public QObject
+class QP888Device : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool connected READ connected WRITE setConnected NOTIFY connectedChanged)
@@ -34,8 +35,8 @@ class QPDevice888 : public QObject
 
 
 public:
-    explicit QPDevice888(QObject *parent = 0);
-    ~QPDevice888();
+    explicit QP888Device(QObject *parent = 0);
+    ~QP888Device();
 
     void open();
     void close();
@@ -61,9 +62,9 @@ public slots:
     void setPhidget(CPhidgetHandle phidget);
 
 private:
-    QScopedPointer<QPDevice888Private> p;
+    QScopedPointer<QP888DevicePrivate> p;
 };
 
-Q_DECLARE_METATYPE(QPDevice888 *)
+Q_DECLARE_METATYPE(QP888Device *)
 
 #endif // QPDEVICE888_H

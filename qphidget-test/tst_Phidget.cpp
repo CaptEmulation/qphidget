@@ -22,7 +22,7 @@ limitations under the License.
 #include "mock/QPMock888Device.h"
 #include "phidget21.h"
 #include "mock/QPMock.h"
-#include "QPDevice888.h"
+#include "QP888Device.h"
 #include "QPInterfaceKitFactory.h"
 
 class PhidgetTest : public QObject
@@ -38,7 +38,7 @@ private Q_SLOTS:
     void sanityTest();
 
     void device888ListensToInput() {
-        QPDevice888 *device = ikFactory->getDevice();
+        QP888Device *device = ikFactory->getDevice();
         for(int i = 0; i < 8; i++) {
             QCOMPARE(device->getInput(i), false);
             mock888Device->setInput(i, i % 2 == 1);
@@ -47,7 +47,7 @@ private Q_SLOTS:
     }
 
     void device888InputsExist() {
-        QPDevice888 *device = ikFactory->getDevice();
+        QP888Device *device = ikFactory->getDevice();
         QCOMPARE(device->inputs().length(), 8);
         QCOMPARE(device->outputs().length(), 8);
     }
@@ -85,7 +85,7 @@ void PhidgetTest::cleanupTestCase()
 
 void PhidgetTest::sanityTest()
 {
-    QPDevice888 *device = new QPDevice888(this);
+    QP888Device *device = new QP888Device(this);
     QVERIFY2(device, "Failure");
 }
 

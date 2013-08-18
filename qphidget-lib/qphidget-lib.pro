@@ -40,13 +40,13 @@ INCLUDEPATH += src
 
 SOURCES += \
     src/QPInterfaceKitFactory.cpp \
-    src/QPDevice888.cpp \
+    src/QP888Device.cpp \
     src/QPManager.cpp \
     src/QPDigitalIO.cpp
 
 HEADERS += \
     qphidget-lib_global.h \
-    src/QPDevice888.h \
+    src/QP888Device.h \
     src/QPManager.h \
     src/QPDigitalIO.h \
     src/QPInterfaceKitFactory.h \

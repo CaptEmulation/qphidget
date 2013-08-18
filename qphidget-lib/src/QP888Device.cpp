@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "QPDevice888.h"
+#include "QP888Device.h"
 
 int inputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState);
 
-class QPDevice888Private
+class QP888DevicePrivate
 {
 public:
-    QPDevice888 *self;
+    QP888Device *self;
     bool mConnected;
     bool mOpen;
     CPhidgetHandle mPhidget;
@@ -77,73 +77,73 @@ public:
     }
 };
 
-QPDevice888::QPDevice888(QObject *parent) :
+QP888Device::QP888Device(QObject *parent) :
     QObject(parent),
-    p(new QPDevice888Private)
+    p(new QP888DevicePrivate)
 {
     p->self = this;
     p->initialize();
 }
 
-QPDevice888::~QPDevice888()
+QP888Device::~QP888Device()
 {
     CPhidget_delete((CPhidgetHandle)p->mIfkPhidget);
 }
 
-void QPDevice888::open()
+void QP888Device::open()
 {
     p->open();
 }
 
-void QPDevice888::close()
+void QP888Device::close()
 {
     p->close();
 }
 
-bool QPDevice888::getInput(qint32 index)
+bool QP888Device::getInput(qint32 index)
 {
     return p->getInput(index);
 }
 
-void QPDevice888::setOutput(qint32 index, bool value)
+void QP888Device::setOutput(qint32 index, bool value)
 {
     p->setOutput(index, value);
 }
 
-bool QPDevice888::connected()
+bool QP888Device::connected()
 {
     return p->mConnected;
 }
 
 
-QList<QPDigitalIO *> QPDevice888::inputs()
+QList<QPDigitalIO *> QP888Device::inputs()
 {
     return p->mInputs;
 }
 
-QList<QPDigitalIO *> QPDevice888::outputs()
+QList<QPDigitalIO *> QP888Device::outputs()
 {
     return p->mOutputs;
 }
 
-CPhidgetHandle QPDevice888::phidget()
+CPhidgetHandle QP888Device::phidget()
 {
     return p->mPhidget;
 }
 
 
-void QPDevice888::setConnected(bool connected)
+void QP888Device::setConnected(bool connected)
 {
     p->setConnected(connected);
 }
 
-void QPDevice888::setPhidget(CPhidgetHandle phidget)
+void QP888Device::setPhidget(CPhidgetHandle phidget)
 {
     p->setPhidget(phidget);
 }
 
 int inputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState) {
-    QPDevice888Private *instance = (QPDevice888Private *)userPtr;
+    QP888DevicePrivate *instance = (QP888DevicePrivate *)userPtr;
     instance->setInput(index, inputState);
     return 0;
 }
