@@ -15,22 +15,58 @@ limitations under the License.
 */
 
 #include "QPMockDevice.h"
+#include "QPMock.h"
 
 class QPMockDevicePrivate
 {
 public:
+    QPMockDevice *self;
     CPhidget_DeviceClass mDeviceClass;
+    QList<QPMockDevice::ConnectEvent> mAttachListeners;
+    QList<QPMockDevice::ConnectEvent> mDetachListeners;
+
+    void setAttachListener(QPMockDevice::ConnectEvent callback) {
+        mAttachListeners.append(callback);
+    }
+
+    void setDetachListener(QPMockDevice::ConnectEvent callback) {
+        mDetachListeners.append(callback);
+    }
+
+    void attach() {
+        QPMock::singleton->attached(self);
+        foreach(QPMockDevice::ConnectEvent e, mAttachListeners) {
+            e.fptr(self, e.userPtr);
+        }
+    }
+
+    void detach() {
+        // TODO detach from manager
+        foreach(QPMockDevice::ConnectEvent e, mDetachListeners) {
+            e.fptr(self, e.userPtr);
+        }
+    }
 };
 
 QPMockDevice::QPMockDevice(QObject *parent) :
     QObject(parent),
     p(new QPMockDevicePrivate)
 {
-
+    p->self = this;
 }
 
 QPMockDevice::~QPMockDevice()
 {
+}
+
+void QPMockDevice::attach()
+{
+    p->attach();
+}
+
+void QPMockDevice::detach()
+{
+    p->detach();
 }
 
 CPhidget_DeviceClass QPMockDevice::deviceClass()
@@ -41,5 +77,21 @@ CPhidget_DeviceClass QPMockDevice::deviceClass()
 void QPMockDevice::setDeviceClass(CPhidget_DeviceClass deviceClass)
 {
     p->mDeviceClass = deviceClass;
+}
+
+void QPMockDevice::setAttachListener(int (*fptr)(CPhidgetHandle, void *), void *userPtr)
+{
+    QPMockDevice::ConnectEvent callback;
+    callback.fptr = fptr;
+    callback.userPtr = userPtr;
+    p->setAttachListener(callback);
+}
+
+void QPMockDevice::setDetachListener(int (*fptr)(CPhidgetHandle, void *), void *userPtr)
+{
+    QPMockDevice::ConnectEvent callback;
+    callback.fptr = fptr;
+    callback.userPtr = userPtr;
+    p->setDetachListener(callback);
 }
 

@@ -28,6 +28,7 @@ class QPMock888Device : public QPMockDevice
     Q_OBJECT
 public:
     explicit QPMock888Device(QObject *parent = 0);
+    ~QPMock888Device();
     
     int setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr);
     int setInput(int index, bool input);

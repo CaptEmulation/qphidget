@@ -24,6 +24,8 @@ limitations under the License.
 #ifndef PHIDGET21_H
 #define PHIDGET21_H
 
+
+
 typedef enum
 {
  PHIDCLASS_INTERFACEKIT = 7				/**< Phidget Interface Kit */
@@ -65,39 +67,46 @@ class QPMock;
 typedef QPMock *CPhidgetManagerHandle;
 
 
+class QPMock888Device;
+typedef QPMock888Device *CPhidgetInterfaceKitHandle;
+
+// Callback types
+
+typedef int (*DeviceCallback) (CPhidgetHandle phid, void *userPtr);
+typedef int (*ManagerCallback) (CPhidgetHandle phid, void *userPtr);
+typedef int (*ManagerErrorCallback) (CPhidgetManagerHandle phidm, void *userPtr, int errorCode, const char *errorString);
+typedef int (*InterfaceKitInputCallback) (CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState);
+
+
+// System
 int CPhidget_enableLogging (CPhidgetLog_level level, const char *outputFile);
 
-
+// Base Phidget
 int CPhidget_open (CPhidgetHandle phid, int serialNumber);
 int CPhidget_close (CPhidgetHandle phid);
 int CPhidget_delete (CPhidgetHandle phid);
-int CPhidget_set_OnDetach_Handler (CPhidgetHandle phid, int (__stdcall * fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
-int CPhidget_set_OnAttach_Handler (CPhidgetHandle phid, int (__stdcall * fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
+int CPhidget_set_OnDetach_Handler (CPhidgetHandle phid, int (* fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
+int CPhidget_set_OnAttach_Handler (CPhidgetHandle phid, int (* fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
 
-
-
+// Phidget Manager
 int CPhidgetManager_create (CPhidgetManagerHandle * phidm);
 int CPhidgetManager_open (CPhidgetManagerHandle phidm);
 int CPhidgetManager_close (CPhidgetManagerHandle phidm);
 int CPhidgetManager_delete (CPhidgetManagerHandle phidm);
-int CPhidgetManager_set_OnAttach_Handler (CPhidgetManagerHandle phidm, int (__stdcall * fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
-int CPhidgetManager_set_OnDetach_Handler (CPhidgetManagerHandle phidm, int (__stdcall * fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
+int CPhidgetManager_set_OnAttach_Handler (CPhidgetManagerHandle phidm, int (* fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
+int CPhidgetManager_set_OnDetach_Handler (CPhidgetManagerHandle phidm, int (* fptr) (CPhidgetHandle phid, void *userPtr), void *userPtr);
 int CPhidgetManager_getAttachedDevices (CPhidgetManagerHandle phidm, CPhidgetHandle * phidArray[], int *count);
 int CPhidgetManager_freeAttachedDevicesArray (CPhidgetHandle phidArray[]);
 int CPhidgetManager_set_OnError_Handler (CPhidgetManagerHandle phidm, int (* fptr) (CPhidgetManagerHandle phidm, void *userPtr, int errorCode, const char *errorString),
                          void *userPtr);
 int __stdcall CPhidget_getDeviceClass (CPhidgetHandle phid, CPhidget_DeviceClass * deviceClass);
 
-
-
 /************************ Interface Kit mock ***********************/
 
-class QPMock888Device;
-typedef QPMock888Device *CPhidgetInterfaceKitHandle;
 
 int CPhidgetInterfaceKit_create (CPhidgetInterfaceKitHandle * phid);
 int CPhidgetInterfaceKit_setOutputState (CPhidgetInterfaceKitHandle phid, int index, int outputState);
-int CPhidgetInterfaceKit_set_OnInputChange_Handler (CPhidgetInterfaceKitHandle phid, int (__stdcall * fptr) (CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState),
+int CPhidgetInterfaceKit_set_OnInputChange_Handler (CPhidgetInterfaceKitHandle phid, int (* fptr) (CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState),
                                 void *userPtr);
 
 #endif // PHIDGET21_H

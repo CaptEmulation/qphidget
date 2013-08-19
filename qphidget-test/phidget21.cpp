@@ -141,13 +141,14 @@ int CPhidgetInterfaceKit_setOutputState(CPhidgetInterfaceKitHandle phid, int ind
 
 int CPhidget_set_OnDetach_Handler(CPhidgetHandle phid, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
 {
-    // TODO: Implement mock
+
+    phid->setDetachListener(fptr, userPtr);
     return 0;
 }
 
 
 int CPhidget_set_OnAttach_Handler(CPhidgetHandle phid, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
 {
-    // TODO: Implement mock
+    phid->setAttachListener(fptr, userPtr);
     return 0;
 }

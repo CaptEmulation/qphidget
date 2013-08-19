@@ -53,6 +53,16 @@ QPMock::~QPMock()
 {
 }
 
+void QPMock::reset()
+{
+    while(!p->mocks.empty()) {
+        p->mocks.removeLast();
+    }
+    p->attachHandlers = QMap<CPhidgetManagerHandle, ConnectCallback>();
+    p->detachHandlers = QMap<CPhidgetManagerHandle, ConnectCallback>();
+    p->errorHandlers = QMap<CPhidgetManagerHandle, ErrorCallback>();
+}
+
 bool QPMock::isConnected()
 {
     return p->mConnected;

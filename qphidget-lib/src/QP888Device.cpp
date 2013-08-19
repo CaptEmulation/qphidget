@@ -33,6 +33,7 @@ public:
 
     void initialize() {
         mPhidget = Q_NULLPTR;
+        mConnected = false;
 
         // Initialize individual IO objects
         for(int i = 0; i < 8; i++) {

@@ -33,11 +33,22 @@ class QPMockDevice  : public QObject
     Q_OBJECT
 
 public:
+    struct ConnectEvent {
+        DeviceCallback fptr;
+        void *userPtr;
+    };
+
     explicit QPMockDevice(QObject *parent = 0);
     ~QPMockDevice();
 
+    void attach();
+    void detach();
+
     CPhidget_DeviceClass deviceClass();
     void setDeviceClass(CPhidget_DeviceClass deviceClass);
+
+    void setAttachListener(int (*fptr)(CPhidgetHandle, void *), void *userPtr);
+    void setDetachListener(int (*fptr)(CPhidgetHandle, void *), void *userPtrk);
 
 private:
     QScopedPointer<QPMockDevicePrivate> p;

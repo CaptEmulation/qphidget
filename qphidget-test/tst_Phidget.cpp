@@ -31,64 +31,77 @@ class PhidgetTest : public QObject
     
 public:
     PhidgetTest();
+    ~PhidgetTest();
     
 private Q_SLOTS:
-    void initTestCase();
-    void cleanupTestCase();
-    void sanityTest();
+    void initTestCase() {
+        qRegisterMetaType<CPhidgetHandle>();
+    }
+
+    void cleanupTestCase() {
+
+    }
+
+    void cleanup() {
+        mock.reset();
+    }
+
+    void sanityTest() {
+        QScopedPointer<QPManager> manager(new QPManager);
+        QScopedPointer<QPInterfaceKitFactory> ikFactory(new QPInterfaceKitFactory);
+        manager->addDeviceInterface(PHIDCLASS_INTERFACEKIT, ikFactory.data());
+        QSignalSpy spy(manager.data(), SIGNAL(deviceAttached(CPhidgetHandle)));
+        manager->open();
+
+        QCOMPARE(spy.count(), 0);
+        QScopedPointer<QPMock888Device> mock888Device(new QPMock888Device);
+        mock888Device->attach();
+        QCOMPARE(spy.count(), 1);
+        QList<QVariant> arguments = spy.takeFirst(); // take the first signal
+        QCOMPARE(arguments.at(0).value<CPhidgetHandle>(), mock888Device.data()); // verify the first argument
+    }
+
+    void make888DeviceConnectionTest() {
+        QScopedPointer<QP888Device> device(new QP888Device());
+        QScopedPointer<QPMock888Device> mockDevice(new QPMock888Device());
+        QVERIFY2(!device.isNull(), "Device should exist");
+        QVERIFY2(!device->connected(),  "Device should not be connected, it has not been opened or attached");
+        device->open();
+        QVERIFY2(!device->connected(),  "Device should not be connected, it has not been attached");
+        mockDevice->attach();
+        QVERIFY2(device->connected(),  "Device has been opened and attached, it should be connected");
+    }
 
     void device888ListensToInput() {
-        QP888Device *device = ikFactory->getDevice();
+        QScopedPointer<QP888Device> device(new QP888Device());
+        QScopedPointer<QPMock888Device> mockDevice(new QPMock888Device());
+        device->open();
+        mockDevice->attach();
+
         for(int i = 0; i < 8; i++) {
             QCOMPARE(device->getInput(i), false);
-            mock888Device->setInput(i, i % 2 == 1);
+            mockDevice->setInput(i, i % 2 == 1);
             QCOMPARE(device->getInput(i), i % 2 == 1);
         }
     }
 
     void device888InputsExist() {
-        QP888Device *device = ikFactory->getDevice();
+        QScopedPointer<QP888Device> device(new QP888Device());
         QCOMPARE(device->inputs().length(), 8);
         QCOMPARE(device->outputs().length(), 8);
     }
 
 private:
     QPMock mock;
-    QPMock888Device *mock888Device;
-    QPManager *manager;
-    QPInterfaceKitFactory *ikFactory;
 };
 
 PhidgetTest::PhidgetTest()
 {
 }
 
-void PhidgetTest::initTestCase()
+PhidgetTest::~PhidgetTest()
 {
-    qRegisterMetaType<CPhidgetHandle>();
-    manager = new QPManager(this);
-    ikFactory = new QPInterfaceKitFactory(this);
-    manager->addDeviceInterface(PHIDCLASS_INTERFACEKIT, ikFactory);
-    QSignalSpy spy(manager, SIGNAL(deviceAttached(CPhidgetHandle)));
-    manager->open();
-    QCOMPARE(spy.count(), 0);
-    mock888Device = new QPMock888Device(this);
-    QCOMPARE(spy.count(), 1);
-    QList<QVariant> arguments = spy.takeFirst(); // take the first signal
-    QCOMPARE(arguments.at(0).value<CPhidgetHandle>(), mock888Device); // verify the first argument
 }
-
-void PhidgetTest::cleanupTestCase()
-{
-
-}
-
-void PhidgetTest::sanityTest()
-{
-    QP888Device *device = new QP888Device(this);
-    QVERIFY2(device, "Failure");
-}
-
 
 QTEST_APPLESS_MAIN(PhidgetTest)
 

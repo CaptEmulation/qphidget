@@ -45,7 +45,6 @@ public:
         mOutput = 0;
         self->setDeviceClass(PHIDCLASS_INTERFACEKIT);
         QPMock::singleton->appendMock(self);
-        QPMock::singleton->attached(self);
     }
 
     int setInput(int index, bool input) {
@@ -79,6 +78,10 @@ QPMock888Device::QPMock888Device(QObject *parent) :
 {
     p->self = this;
     p->initialize();
+}
+
+QPMock888Device::~QPMock888Device()
+{
 }
 
 int QPMock888Device::setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)

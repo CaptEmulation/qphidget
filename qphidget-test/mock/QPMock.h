@@ -23,7 +23,7 @@ limitations under the License.
 
 class QPMockPrivate;
 /**
- * @brief The QPMock class is a phidget library for the tests
+ * @brief The QPMock class is a phidget library interfacing between tests and the phidget API
  */
 class QPMock : public QObject
 {
@@ -31,23 +31,27 @@ class QPMock : public QObject
 public:
     explicit QPMock(QObject *parent = 0);
     ~QPMock();
-
+    // Global static singleton (easiest way to access from C-style proxy library
     static QPMock *singleton;
 
-    bool isConnected();
-    void setConnected(bool connected);
-
-    int appendAttachListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr);
-    void attached(CPhidgetHandle device);
-    int appendDetachListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr);
-    int appendErrorListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetManagerHandle, void *, int, const char *), void *userPtr);
-    int getAttachedDevices(CPhidgetManagerHandle phidm, CPhidgetHandle *phidArray[], int *count);
-
+    // Test Mock API
+    void reset();
     QList<CPhidgetHandle> mocks();
     void appendMock(CPhidgetHandle device);
     CPhidgetHandle getMockOfClass(CPhidget_DeviceClass deviceClass);
 
+    bool isConnected();
+    void setConnected(bool connected);
+    void attached(CPhidgetHandle device);
+
+    // Returns a QPMock888Device
     QPMockDevice *mockInterfaceKey();
+
+    // CPhidget library API
+    int appendAttachListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr);
+    int appendDetachListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr);
+    int appendErrorListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetManagerHandle, void *, int, const char *), void *userPtr);
+    int getAttachedDevices(CPhidgetManagerHandle phidm, CPhidgetHandle *phidArray[], int *count);
 
 signals:
 
