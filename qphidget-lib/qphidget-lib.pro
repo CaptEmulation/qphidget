@@ -21,9 +21,7 @@ CONFIG(debug) {
 
 # Phidget library settings
 
-macx:unix {
-    LIBS += phidget21
-}
+unix: LIBS += -lphidget21
 
 win32 {
     win32:LIBS += "C:/Program Files/Phidgets/phidget21.lib"

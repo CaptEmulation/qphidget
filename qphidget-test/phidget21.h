@@ -16,7 +16,7 @@ limitations under the License.
 
 /**
   * This is a test mock implementation of the Phidget API, for unit testing.
-  * This is a complete reimplementation for production code.  For tests, use the mock/* classes
+  * This is a complete reimplementation for production code.  For tests, use the mock classes
   * Phidget21 API Copyright by its respective owner
   */
 
@@ -99,7 +99,7 @@ int CPhidgetManager_getAttachedDevices (CPhidgetManagerHandle phidm, CPhidgetHan
 int CPhidgetManager_freeAttachedDevicesArray (CPhidgetHandle phidArray[]);
 int CPhidgetManager_set_OnError_Handler (CPhidgetManagerHandle phidm, int (* fptr) (CPhidgetManagerHandle phidm, void *userPtr, int errorCode, const char *errorString),
                          void *userPtr);
-int __stdcall CPhidget_getDeviceClass (CPhidgetHandle phid, CPhidget_DeviceClass * deviceClass);
+int CPhidget_getDeviceClass (CPhidgetHandle phid, CPhidget_DeviceClass * deviceClass);
 
 /************************ Interface Kit mock ***********************/
 

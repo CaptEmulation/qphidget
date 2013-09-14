@@ -15,9 +15,7 @@
 
 
 # Phidget library
-macx:unix {
-    LIBS += phidget21
-}
+unix: LIBS += -lphidget21
 
 win32 {
     LIBS += "C:/Program Files/Phidgets/phidget21.lib"
@@ -27,20 +25,6 @@ win32 {
 
 
 #QPhidget library
-unix {
-    CONFIG(debug) {
-        LIBS += "$$PWD/../qphidget-lib/debug/qphidget-lib.so"
-    } else {
-        LIBS += "$$PWD/../qphidget-lib/release/qphidget-lib.so"
-    }
-}
-win32 {
-    CONFIG(debug) {
-        LIBS += "$$PWD/../qphidget-lib/debug/qphidget-lib.lib"
-    } else {
-        LIBS += "$$PWD/../qphidget-lib/release/qphidget-lib.lib"
-    }
-}
 
 INCLUDEPATH += ../qphidget-lib/src
 HEADERS += $$PWD/../qphidget-lib/src/*.h \
@@ -90,3 +74,14 @@ unix {
     INSTALLS += target qmldir
 }
 
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-lib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-libd
+else:unix: LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-lib
+
+INCLUDEPATH += $$PWD/../qphidget-lib
+DEPENDPATH += $$PWD/../qphidget-lib
+
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-lib/qphidget-lib.lib
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-lib/qphidget-libd.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../qphidget-lib/libqphidget-lib.a
