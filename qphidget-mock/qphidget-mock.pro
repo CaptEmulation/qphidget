@@ -17,14 +17,20 @@ SOURCES += \
     src/phidget21.cpp \
     src/QPMockDevice.cpp \
     src/QPMock888Device.cpp \
-    src/QPMock.cpp
+    src/QPMock.cpp \
+    src/QPMockBehavior.cpp \
+    src/QPMockBehaviorContext.cpp \
+    src/QPMockBehaviorDelegate.cpp
 
 HEADERS +=\
         qphidget-mock_global.h \
     src/QPMockDevice.h \
     src/QPMock888Device.h \
     src/QPMock.h \
-    src/phidget21.h
+    src/phidget21.h \
+    src/QPMockBehavior.h \
+    src/QPMockBehaviorContext.h \
+    src/QPMockBehaviorDelegate.h
 
 unix:!symbian {
     maemo5 {
