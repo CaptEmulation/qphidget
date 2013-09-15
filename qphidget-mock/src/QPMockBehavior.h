@@ -1,7 +1,7 @@
 #ifndef QPMOCKBEHAVIOR_H
 #define QPMOCKBEHAVIOR_H
 
-#include "QPMockBehaviorContext.h"
+#include "QPMockBehaviorDelegate.h"
 
 #include <QObject>
 #include <QTime>
@@ -13,7 +13,7 @@ class QPMockBehavior : public QObject
     Q_OBJECT
     Q_PROPERTY(QTime currentTime READ currentTime WRITE setCurrentTime NOTIFY currentTimeChanged)
     Q_PROPERTY(qint32 tickMs READ tick WRITE setTick NOTIFY tickChanged)
-
+    Q_PROPERTY(QList<QPMockBehaviorDelegate *> behaviors READ behaviors)
 
 public:
     QPMockBehavior(QObject *parent = 0);
@@ -21,6 +21,8 @@ public:
 
     QTime currentTime() const;
     qint32 tick();
+    QList<QPMockBehaviorDelegate *> behaviors();
+    void addBehavior(QPMockBehaviorDelegate *behavior);
 public slots:
     void setCurrentTime(QTime time);
     void setTick(qint32 mseconds);

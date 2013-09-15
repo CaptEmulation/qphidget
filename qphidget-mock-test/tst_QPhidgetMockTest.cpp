@@ -12,34 +12,50 @@ public:
     QPhidgetMockTest();
 
 private Q_SLOTS:
-    void initTestCase();
-    void cleanupTestCase();
-    void testInit();
-    void testInit_data();
+    void initTestCase() {
+
+    }
+
+    void cleanupTestCase() {
+
+    }
+
+    void testInit() {
+        QTime now = QTime::currentTime();
+
+        QScopedPointer<QPMockBehavior> behavior(new QPMockBehavior());
+        QVERIFY(behavior);
+
+        QCOMPARE(behavior->currentTime(), QTime(0, 0));
+    }
+
+    void testAddBehavior() {
+        QScopedPointer<QPTestBehavior> testBehavior(new QPTestBehavior);
+        QScopedPointer<QPMockBehavior> behavior(new QPMockBehavior());
+
+        behavior->addBehavior(testBehavior.data());
+        QCOMPARE(behavior->behaviors().length(), 1);
+    }
+
+    void testUpdateBehavior() {
+        QScopedPointer<QPTestBehavior> testBehavior(new QPTestBehavior);
+        QScopedPointer<QPMockBehavior> behavior(new QPMockBehavior());
+        testBehavior->setNextTimeChange(QTime(0,1));
+        behavior->addBehavior(testBehavior.data());
+        behavior->setCurrentTime(QTime(0,2));
+
+        QVERIFY(testBehavior->wasUpdated());
+        QCOMPARE(testBehavior->contexts().length(), 1);
+    }
+
+    void testInit_data() {
+        QTest::addColumn<QString>("data");
+        QTest::newRow("0") << QString("foo");
+    }
 };
 
 QPhidgetMockTest::QPhidgetMockTest()
 {
-}
-
-void QPhidgetMockTest::initTestCase()
-{
-}
-
-void QPhidgetMockTest::cleanupTestCase()
-{
-}
-
-void QPhidgetMockTest::testInit()
-{
-    QPMockBehavior *behavior = new QPMockBehavior(this);
-    QVERIFY(behavior);
-}
-
-void QPhidgetMockTest::testInit_data()
-{
-    QTest::addColumn<QString>("data");
-    QTest::newRow("0") << QString("foo");
 }
 
 QTEST_APPLESS_MAIN(QPhidgetMockTest)

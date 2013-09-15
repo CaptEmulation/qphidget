@@ -25,6 +25,7 @@ QPTestBehavior::QPTestBehavior(QObject *parent) :
     QPMockBehaviorDelegate(parent),
     p(new QPTestBehaviorPrivate)
 {
+    p->self = this;
     p->mWasUpdated = false;
 }
 

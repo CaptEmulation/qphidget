@@ -1,5 +1,5 @@
 #ifndef QPMockBehaviorDelegateDELEGATE_H
-#define QPMockBehaviorDELEGATE_H
+#define QPMockBehaviorDelegateDELEGATE_H
 
 #include "QPMockBehaviorContext.h"
 

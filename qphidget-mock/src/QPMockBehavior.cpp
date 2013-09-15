@@ -7,6 +7,29 @@ public:
 
     QTime mCurrentTime;
     qint32 mTickMs;
+    QList<QPMockBehaviorDelegate *> mBehaviors;
+
+    void addBehavior(QPMockBehaviorDelegate *behavior) {
+        mBehaviors.append(behavior);
+    }
+
+    void setCurrentTime(QTime time) {
+        if(mCurrentTime != time) {
+            mCurrentTime = time;
+            emit self->currentTimeChanged(time);
+
+            checkForUpdates();
+        }
+    }
+
+    void checkForUpdates() {
+        foreach(QPMockBehaviorDelegate *delegate, mBehaviors) {
+            if (delegate->nextTimeChange() < mCurrentTime) {
+                delegate->setNextTimeChange(mCurrentTime);
+                delegate->update(Q_NULLPTR);
+            }
+        }
+    }
 };
 
 QPMockBehavior::QPMockBehavior(QObject *parent)
@@ -15,6 +38,7 @@ QPMockBehavior::QPMockBehavior(QObject *parent)
 {
     p->self = this;
     p->mTickMs = 0;
+    p->mCurrentTime.setHMS(0, 0, 0, 0);
 }
 
 QPMockBehavior::~QPMockBehavior()
@@ -32,6 +56,16 @@ qint32 QPMockBehavior::tick()
     return p->mTickMs;
 }
 
+QList<QPMockBehaviorDelegate *> QPMockBehavior::behaviors()
+{
+    return p->mBehaviors;
+}
+
+void QPMockBehavior::addBehavior(QPMockBehaviorDelegate *behavior)
+{
+    p->addBehavior(behavior);
+}
+
 void QPMockBehavior::setTick(qint32 mseconds)
 {
     if (p->mTickMs != mseconds) {
@@ -42,8 +76,5 @@ void QPMockBehavior::setTick(qint32 mseconds)
 
 void QPMockBehavior::setCurrentTime(QTime time)
 {
-    if(p->mCurrentTime != time) {
-        p->mCurrentTime = time;
-        emit currentTimeChanged(time);
-    }
+    p->setCurrentTime(time);
 }

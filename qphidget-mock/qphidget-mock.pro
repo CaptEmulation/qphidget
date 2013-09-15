@@ -20,7 +20,8 @@ SOURCES += \
     src/QPMock.cpp \
     src/QPMockBehavior.cpp \
     src/QPMockBehaviorContext.cpp \
-    src/QPMockBehaviorDelegate.cpp
+    src/QPMockBehaviorDelegate.cpp \
+    src/QPMockDataBehavior.cpp
 
 HEADERS +=\
         qphidget-mock_global.h \
@@ -30,7 +31,8 @@ HEADERS +=\
     src/phidget21.h \
     src/QPMockBehavior.h \
     src/QPMockBehaviorContext.h \
-    src/QPMockBehaviorDelegate.h
+    src/QPMockBehaviorDelegate.h \
+    src/QPMockDataBehavior.h
 
 unix:!symbian {
     maemo5 {
