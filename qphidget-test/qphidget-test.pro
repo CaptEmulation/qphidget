@@ -32,21 +32,17 @@ SOURCES += $$PWD/../qphidget-lib/src/*.cpp
 
 # Test Sources
 
-SOURCES += tst_Phidget.cpp \
-    phidget21.cpp \
-    mock/QPMock.cpp \
-    mock/QPMock888Device.cpp \
-    mock/QPMockDevice.cpp
+SOURCES += tst_Phidget.cpp
 
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
-INCLUDEPATH += . mock
+HEADERS += $$PWD/../wphidget-mock/src/phidget21.h
 
-HEADERS += \
-    phidget21.h \
-    mock/QPMock.h \
-    mock/QPMock888Device.h \
-    mock/QPMockDevice.h
+#qphidget-mock library
 
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mock
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mockd
+else:unix: LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mock
 
-
+INCLUDEPATH += $$PWD/../qphidget-mock/src
+DEPENDPATH += $$PWD/../qphidget-mock

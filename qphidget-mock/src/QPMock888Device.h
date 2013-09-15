@@ -19,7 +19,7 @@ limitations under the License.
 #define QPMOCK888DEVICE_H
 
 #include <QObject>
-#include <mock/QPMockDevice.h>
+#include <QPMockDevice.h>
 
 class QPMock888DevicePrivate;
 

@@ -18,10 +18,10 @@ limitations under the License.
 #include <QString>
 #include <QtTest>
 
-#include "mock/QPMockDevice.h"
-#include "mock/QPMock888Device.h"
+#include "QPMockDevice.h"
+#include "QPMock888Device.h"
 #include "phidget21.h"
-#include "mock/QPMock.h"
+#include "QPMock.h"
 #include "QP888Device.h"
 #include "QPInterfaceKitFactory.h"
 

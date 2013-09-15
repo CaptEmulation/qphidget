@@ -16,11 +16,10 @@ limitations under the License.
 
 
 #include "phidget21.h"
-#include "mock/QPMock.h"
-#include "mock/QPMockDevice.h"
-#include "mock/QPMock888Device.h"
+#include "QPMock.h"
+#include "QPMockDevice.h"
+#include "QPMock888Device.h"
 
-#include <QTest>
 #include <QMap>
 
 
