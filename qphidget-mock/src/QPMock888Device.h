@@ -19,7 +19,11 @@ limitations under the License.
 #define QPMOCK888DEVICE_H
 
 #include <QObject>
-#include <QPMockDevice.h>
+#include <QVariantMap>
+
+#include "QPMockDevice.h"
+
+#define NUM_OF_PORTS 8
 
 class QPMock888DevicePrivate;
 
@@ -33,11 +37,14 @@ public:
     int setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr);
     int setInput(int index, bool input);
     int setOutput(int index, bool output);
-
 signals:
     
 public slots:
     
+
+protected:
+    virtual void doSetData(const QVariantMap &data);
+
 private:
     QScopedPointer<QPMock888DevicePrivate> p;
 };

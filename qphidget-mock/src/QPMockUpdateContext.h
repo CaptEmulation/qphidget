@@ -4,16 +4,16 @@
 #include <QObject>
 #include <QTime>
 
-class QPMockBehaviorContextPrivate;
+class QPMockUpdateContextPrivate;
 
-class QPMockBehaviorContext : public QObject
+class QPMockUpdateContext : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QTime currentTime READ currentTime WRITE setCurrentTime NOTIFY currentTimeChanged)
 
 public:
-    explicit QPMockBehaviorContext(QObject *parent = 0);
-    ~QPMockBehaviorContext();
+    explicit QPMockUpdateContext(QObject *parent = 0);
+    ~QPMockUpdateContext();
 
     QTime currentTime() const;
 
@@ -24,10 +24,10 @@ public slots:
     void setCurrentTime(QTime time);
 
 private:
-    QScopedPointer<QPMockBehaviorContextPrivate> p;
+    QScopedPointer<QPMockUpdateContextPrivate> p;
 
 };
 
-Q_DECLARE_METATYPE(QPMockBehaviorContext *)
+Q_DECLARE_METATYPE(QPMockUpdateContext *)
 
 #endif // QPMOCKBEHAVIORCONTEXT_H

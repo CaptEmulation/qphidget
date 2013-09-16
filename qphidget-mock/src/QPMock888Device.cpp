@@ -15,8 +15,9 @@ limitations under the License.
 */
 
 #include "QPMock888Device.h"
-
 #include "QPMock.h"
+
+#include <QVariant>
 
 struct InputCallback {
     int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int);
@@ -70,6 +71,19 @@ public:
         // TODO: create and notify listeners
         return 0;
     }
+
+    void doSetData(const QVariantMap &data) {
+        QVariant vInput = data["digital"];
+        if (vInput.canConvert(QVariant::Map)) {
+            QVariantMap inputMap = vInput.toMap();
+             for(int i = 0; i < NUM_OF_PORTS; i++) {
+                 QString key = QString("%1").arg(i);
+                 if (inputMap.contains(key)) {
+                     setInput(i, inputMap.value(key).toBool());
+                 }
+             }
+        }
+    }
 };
 
 QPMock888Device::QPMock888Device(QObject *parent) :
@@ -99,4 +113,9 @@ int QPMock888Device::setInput(int index, bool input)
 int QPMock888Device::setOutput(int index, bool output)
 {
     return p->setOutput(index, output);
+}
+
+void QPMock888Device::doSetData(const QVariantMap &data)
+{
+    p->doSetData(data);
 }

@@ -21,9 +21,21 @@ class QPMockDevicePrivate
 {
 public:
     QPMockDevice *self;
+    QVariantMap mData;
     CPhidget_DeviceClass mDeviceClass;
     QList<QPMockDevice::ConnectEvent> mAttachListeners;
     QList<QPMockDevice::ConnectEvent> mDetachListeners;
+
+    QVariantMap data() {
+        return mData;
+    }
+
+    void setData(QVariantMap data) {
+        if (mData != data) {
+            mData = data;
+            emit self->dataChanged(data);
+        }
+    }
 
     void setAttachListener(QPMockDevice::ConnectEvent callback) {
         mAttachListeners.append(callback);
@@ -53,6 +65,7 @@ QPMockDevice::QPMockDevice(QObject *parent) :
     p(new QPMockDevicePrivate)
 {
     p->self = this;
+    QObject::connect(this, SIGNAL(dataChanged(QVariantMap)), this, SLOT(doSetData(QVariantMap)));
 }
 
 QPMockDevice::~QPMockDevice()
@@ -93,5 +106,15 @@ void QPMockDevice::setDetachListener(int (*fptr)(CPhidgetHandle, void *), void *
     callback.fptr = fptr;
     callback.userPtr = userPtr;
     p->setDetachListener(callback);
+}
+
+QVariantMap QPMockDevice::data()
+{
+    return p->data();
+}
+
+void QPMockDevice::setData(QVariantMap data)
+{
+    p->setData(data);
 }
 

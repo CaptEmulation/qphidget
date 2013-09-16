@@ -19,9 +19,9 @@ SOURCES += \
     src/QPMock888Device.cpp \
     src/QPMock.cpp \
     src/QPMockBehavior.cpp \
-    src/QPMockBehaviorContext.cpp \
-    src/QPMockBehaviorDelegate.cpp \
-    src/QPMockDataBehavior.cpp
+    src/QPMockUpdateContext.cpp \
+    src/QPMockDataBehavior.cpp \
+    src/QPMockUpdateDelegate.cpp
 
 HEADERS +=\
         qphidget-mock_global.h \
@@ -30,9 +30,9 @@ HEADERS +=\
     src/QPMock.h \
     src/phidget21.h \
     src/QPMockBehavior.h \
-    src/QPMockBehaviorContext.h \
-    src/QPMockBehaviorDelegate.h \
-    src/QPMockDataBehavior.h
+    src/QPMockUpdateContext.h \
+    src/QPMockDataBehavior.h \
+    src/QPMockUpdateDelegate.h
 
 unix:!symbian {
     maemo5 {
@@ -51,7 +51,3 @@ else:unix: LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-lib
 
 INCLUDEPATH += $$PWD/../qphidget-lib
 DEPENDPATH += $$PWD/../qphidget-lib
-
-win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-lib/qphidget-lib.lib
-else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-lib/qphidget-libd.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../qphidget-lib/libqphidget-lib.a

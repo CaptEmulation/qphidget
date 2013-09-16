@@ -5,7 +5,7 @@ public:
 
     QPTestBehavior *self;
     bool mWasUpdated;
-    QList<QPMockBehaviorContext *> mContexts;
+    QList<QPMockUpdateContext *> mContexts;
 
     void triggerUpated() {
         if (!mWasUpdated) {
@@ -14,7 +14,7 @@ public:
         }
     }
 
-    void doUpdate(QPMockBehaviorContext *context) {
+    void doUpdate(QPMockUpdateContext *context) {
         triggerUpated();
         mContexts.append(context);
         self->contextsChanged(mContexts);
@@ -22,7 +22,7 @@ public:
 };
 
 QPTestBehavior::QPTestBehavior(QObject *parent) :
-    QPMockBehaviorDelegate(parent),
+    QPMockUpdateDelegate(parent),
     p(new QPTestBehaviorPrivate)
 {
     p->self = this;
@@ -39,12 +39,12 @@ bool QPTestBehavior::wasUpdated()
     return p->mWasUpdated;
 }
 
-QList<QPMockBehaviorContext *> QPTestBehavior::contexts()
+QList<QPMockUpdateContext *> QPTestBehavior::contexts()
 {
     return p->mContexts;
 }
 
-void QPTestBehavior::doUpdate(QPMockBehaviorContext *context)
+void QPTestBehavior::doUpdate(QPMockUpdateContext *context)
 {
     p->doUpdate(context);
 }

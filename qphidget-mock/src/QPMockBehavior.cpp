@@ -7,25 +7,30 @@ public:
 
     QTime mCurrentTime;
     qint32 mTickMs;
-    QList<QPMockBehaviorDelegate *> mBehaviors;
+    QList<QPMockUpdateDelegate *> mBehaviors;
 
-    void addBehavior(QPMockBehaviorDelegate *behavior) {
+    void tick() {
+        setCurrentTime(mCurrentTime.addMSecs(mTickMs));
+    }
+
+    void addBehavior(QPMockUpdateDelegate *behavior) {
         mBehaviors.append(behavior);
     }
 
     void setCurrentTime(QTime time) {
         if(mCurrentTime != time) {
+            QTime lastTime = mCurrentTime;
             mCurrentTime = time;
             emit self->currentTimeChanged(time);
 
-            checkForUpdates();
+            checkForUpdates(lastTime);
         }
     }
 
-    void checkForUpdates() {
-        foreach(QPMockBehaviorDelegate *delegate, mBehaviors) {
-            if (delegate->nextTimeChange() < mCurrentTime) {
-                delegate->setNextTimeChange(mCurrentTime);
+    void checkForUpdates(QTime &lastTime) {
+        foreach(QPMockUpdateDelegate *delegate, mBehaviors) {
+            if (delegate->nextTimeChange() <= mCurrentTime &&
+                    delegate->nextTimeChange() > lastTime) {
                 delegate->update(Q_NULLPTR);
             }
         }
@@ -46,31 +51,36 @@ QPMockBehavior::~QPMockBehavior()
 
 }
 
+void QPMockBehavior::tick()
+{
+    p->tick();
+}
+
 QTime QPMockBehavior::currentTime() const
 {
     return p->mCurrentTime;
 }
 
-qint32 QPMockBehavior::tick()
+qint32 QPMockBehavior::tickMs()
 {
     return p->mTickMs;
 }
 
-QList<QPMockBehaviorDelegate *> QPMockBehavior::behaviors()
+QList<QPMockUpdateDelegate *> QPMockBehavior::behaviors()
 {
     return p->mBehaviors;
 }
 
-void QPMockBehavior::addBehavior(QPMockBehaviorDelegate *behavior)
+void QPMockBehavior::addBehavior(QPMockUpdateDelegate *behavior)
 {
     p->addBehavior(behavior);
 }
 
-void QPMockBehavior::setTick(qint32 mseconds)
+void QPMockBehavior::setTickMs(qint32 mseconds)
 {
     if (p->mTickMs != mseconds) {
         p->mTickMs = mseconds;
-        emit tickChanged(mseconds);
+        emit tickMsChanged(mseconds);
     }
 }
 

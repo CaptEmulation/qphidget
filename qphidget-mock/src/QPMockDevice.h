@@ -19,6 +19,7 @@ limitations under the License.
 #define QPMOCKDEVICE_H
 
 #include <QObject>
+#include <QVariantMap>
 #include "phidget21.h"
 
 class QPMockDevicePrivate;
@@ -31,6 +32,8 @@ class QPMockDevicePrivate;
 class QPMockDevice  : public QObject
 {
     Q_OBJECT
+    // Arbitray data for the sub-classes to set themselves to.  Sub-classes should implement doSetData
+    Q_PROPERTY(QVariantMap data READ data WRITE setData NOTIFY dataChanged)
 
 public:
     struct ConnectEvent {
@@ -49,6 +52,18 @@ public:
 
     void setAttachListener(int (*fptr)(CPhidgetHandle, void *), void *userPtr);
     void setDetachListener(int (*fptr)(CPhidgetHandle, void *), void *userPtrk);
+
+    QVariantMap data();
+
+
+signals:
+    void dataChanged(QVariantMap data);
+
+public slots:
+    void setData(QVariantMap data);
+
+protected slots:
+    virtual void doSetData(const QVariantMap &data) = 0;
 
 private:
     QScopedPointer<QPMockDevicePrivate> p;
