@@ -5,7 +5,7 @@
 
 void Qphidget_QmlPlugin::registerTypes(const char *uri)
 {
-    // @uri com.soapbubble.qphidget
+    // @uri com.captemulation.qphidget
     qmlRegisterType<QP888DeviceItem>(uri, 1, 0, "IFK888");
 }
 

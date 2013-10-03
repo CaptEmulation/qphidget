@@ -18,12 +18,14 @@ limitations under the License.
 #include <QString>
 #include <QtTest>
 
+#include "QPMockHandle.h"
 #include "QPMockDevice.h"
 #include "QPMock888Device.h"
 #include "phidget21.h"
 #include "QPMock.h"
 #include "QP888Device.h"
 #include "QPInterfaceKitFactory.h"
+#include "QPMockFactory.h"
 
 class PhidgetTest : public QObject
 {
@@ -33,9 +35,13 @@ public:
     PhidgetTest();
     ~PhidgetTest();
     
+private:
+    QScopedPointer<QPMockFactory> mFactory;
+
 private Q_SLOTS:
     void initTestCase() {
         qRegisterMetaType<CPhidgetHandle>();
+        mFactory.reset(new QPMockFactory);
     }
 
     void cleanupTestCase() {
@@ -43,7 +49,7 @@ private Q_SLOTS:
     }
 
     void cleanup() {
-        mock.reset();
+        QPMock::getSingleton()->reset();
     }
 
     void sanityTest() {
@@ -54,16 +60,24 @@ private Q_SLOTS:
         manager->open();
 
         QCOMPARE(spy.count(), 0);
-        QScopedPointer<QPMock888Device> mock888Device(new QPMock888Device);
+        QPMock888Device *mock888Device = mFactory->ifk888();
         mock888Device->attach();
         QCOMPARE(spy.count(), 1);
         QList<QVariant> arguments = spy.takeFirst(); // take the first signal
-        QCOMPARE(arguments.at(0).value<CPhidgetHandle>(), mock888Device.data()); // verify the first argument
+        QCOMPARE((**arguments.at(0).value<CPhidgetHandle>()).data(), mock888Device); // verify the first argument
+
+    }
+
+    void testEarlyDevice() {
+        mFactory->create();
+        QScopedPointer<QP888Device> device(new QP888Device());
+        device->open();
+        QVERIFY2(!device->connected(), "device is not yet connected");
     }
 
     void make888DeviceConnectionTest() {
         QScopedPointer<QP888Device> device(new QP888Device());
-        QScopedPointer<QPMock888Device> mockDevice(new QPMock888Device());
+        QPMock888Device *mockDevice = mFactory->ifk888();
         QVERIFY2(!device.isNull(), "Device should exist");
         QVERIFY2(!device->connected(),  "Device should not be connected, it has not been opened or attached");
         device->open();
@@ -74,7 +88,7 @@ private Q_SLOTS:
 
     void device888ListensToInput() {
         QScopedPointer<QP888Device> device(new QP888Device());
-        QScopedPointer<QPMock888Device> mockDevice(new QPMock888Device());
+        QPMock888Device *mockDevice = mFactory->ifk888();
         device->open();
         mockDevice->attach();
 
@@ -92,7 +106,6 @@ private Q_SLOTS:
     }
 
 private:
-    QPMock mock;
 };
 
 PhidgetTest::PhidgetTest()

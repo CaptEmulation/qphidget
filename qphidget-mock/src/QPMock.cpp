@@ -15,11 +15,12 @@ limitations under the License.
 */
 
 #include "QPMock.h"
+#include "QPMockHandle.h"
 
 #include <QMap>
 #include "QPMock888Device.h"
 
-QPMock* QPMock::singleton = Q_NULLPTR;
+QPMock* singleton = Q_NULLPTR;
 
 struct ConnectCallback {
     int (*callback)(CPhidgetHandle, void *);
@@ -31,14 +32,82 @@ struct ErrorCallback {
     void *context;
 };
 
+typedef QMultiMap<CPhidget_DeviceClass, QSharedPointer<QPMockHandle> > QPDeviceMap;
+
 class QPMockPrivate
 {
+
 public:
     bool mConnected;
+    QPDeviceMap mMocks;
     QMap<CPhidgetManagerHandle, ConnectCallback> attachHandlers;
     QMap<CPhidgetManagerHandle, ConnectCallback> detachHandlers;
     QMap<CPhidgetManagerHandle, ErrorCallback> errorHandlers;
     QList<CPhidgetHandle> mocks;
+
+    void reset() {
+        foreach(CPhidget_DeviceClass key, mMocks.keys()) {
+            QPDeviceMap::iterator itr = mMocks.find(key);
+            while (itr != mMocks.end() && itr.key() == key) {
+                (**itr.value()).clear();
+                ++itr;
+            }
+
+            mMocks.remove(key);
+        }
+
+        attachHandlers = QMap<CPhidgetManagerHandle, ConnectCallback>();
+        detachHandlers = QMap<CPhidgetManagerHandle, ConnectCallback>();
+        errorHandlers = QMap<CPhidgetManagerHandle, ErrorCallback>();
+    }
+
+    CPhidgetHandle getMockOfClass(CPhidget_DeviceClass deviceClass, qint32 id = -1) {
+
+        QPDeviceMap::const_iterator itr = mMocks.find(deviceClass);
+        while (itr != mMocks.end() && itr.key() == deviceClass) {
+            if((**itr.value())->id() == id) {
+                return itr.value().data();
+            }
+            ++itr;
+        }
+        return 0;
+    }
+
+    void appendMock(IMockDevice *mock) {
+        // Check if we already have a referece
+        QPMockHandle *device = getMockOfClass(mock->deviceClass(), mock->id());
+
+        if(!device) {
+//            CPhidget_DeviceClass deviceClass = (**device)->deviceClass();
+//            QPDeviceMap::iterator itr = mMocks.find(deviceClass);
+//            while (itr != mMocks.end() && itr.key() == deviceClass) {
+//                QSharedPointer<IMockDevice> iPtr = **itr.value();
+//                if (!iPtr.isNull() && iPtr->id() == (**device)->id() || iPtr->id() == -1) {
+//                    itr.value()->reset(mock);
+//                }
+//                ++itr;
+//            }
+//        } else {
+            mMocks.insert(mock->deviceClass(), QSharedPointer<QPMockHandle>(new QPMockHandle(mock)));
+        }
+    }
+
+    void removeMock(IMockDevice *mock) {
+        // Check if we already have a referece
+        QSharedPointer<QPMockHandle> device(getMockOfClass(mock->deviceClass(), mock->id()));
+
+        if(!device.isNull()) {
+            CPhidget_DeviceClass deviceClass = (**device)->deviceClass();
+            QPDeviceMap::const_iterator itr = mMocks.find(deviceClass);
+            while (itr != mMocks.end() && itr.key() == deviceClass) {
+                if((**itr.value())->id() == (**device)->id()) {
+                    mMocks.remove(itr.key(), itr.value());
+                }
+                ++itr;
+            }
+        }
+
+    }
 };
 
 QPMock::QPMock(QObject *parent) :
@@ -46,7 +115,6 @@ QPMock::QPMock(QObject *parent) :
     p(new QPMockPrivate)
 {
     p->mConnected = false;
-    singleton = this;
 }
 
 QPMock::~QPMock()
@@ -55,12 +123,7 @@ QPMock::~QPMock()
 
 void QPMock::reset()
 {
-    while(!p->mocks.empty()) {
-        p->mocks.removeLast();
-    }
-    p->attachHandlers = QMap<CPhidgetManagerHandle, ConnectCallback>();
-    p->detachHandlers = QMap<CPhidgetManagerHandle, ConnectCallback>();
-    p->errorHandlers = QMap<CPhidgetManagerHandle, ErrorCallback>();
+    p->reset();
 }
 
 bool QPMock::isConnected()
@@ -73,6 +136,7 @@ void QPMock::setConnected(bool connected)
     p->mConnected = connected;
 }
 
+
 int QPMock::appendAttachListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
 {
     ConnectCallback data;
@@ -82,11 +146,13 @@ int QPMock::appendAttachListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidg
     return 0;
 }
 
-void QPMock::attached(CPhidgetHandle device)
+CPhidgetHandle QPMock::attached(IMockDevice *mock)
 {
+    CPhidgetHandle device = getMockOfClass(mock->deviceClass(), mock->id());
     foreach(ConnectCallback cc, p->attachHandlers) {
         cc.callback(device, cc.context);
     }
+    return device;
 }
 
 int QPMock::appendDetachListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
@@ -122,23 +188,31 @@ int QPMock::getAttachedDevices(CPhidgetManagerHandle phidm, CPhidgetHandle *phid
     return 0;
 }
 
+QPMock *QPMock::getSingleton()
+{
+    if (singleton == Q_NULLPTR) {
+        singleton = new QPMock();
+    }
+    return singleton;
+}
+
 QList<CPhidgetHandle> QPMock::mocks()
 {
     return p->mocks;
 }
 
-void QPMock::appendMock(CPhidgetHandle device)
+void QPMock::appendMock(IMockDevice *mock)
 {
-    p->mocks.append(device);
+    p->appendMock(mock);
 }
 
-CPhidgetHandle QPMock::getMockOfClass(CPhidget_DeviceClass deviceClass)
+void QPMock::removeMock(IMockDevice *mock)
 {
-    foreach(QPMockDevice *h, p->mocks) {
-        if (h->deviceClass() == deviceClass) {
-            return h;
-        }
-    }
-    return 0;
+    p->removeMock(mock);
+}
+
+CPhidgetHandle QPMock::getMockOfClass(CPhidget_DeviceClass deviceClass, qint32 id)
+{
+    return p->getMockOfClass(deviceClass, id);
 }
 

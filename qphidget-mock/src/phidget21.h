@@ -24,8 +24,6 @@ limitations under the License.
 #ifndef PHIDGET21_H
 #define PHIDGET21_H
 
-
-
 typedef enum
 {
  PHIDCLASS_INTERFACEKIT = 7				/**< Phidget Interface Kit */
@@ -53,12 +51,11 @@ typedef enum
  PHIDGET_LOG_VERBOSE		/**< Everything, including very common messages. */
 } CPhidgetLog_level;
 
-
 /**
  * A phidget handle.
  */
-class QPMockDevice;
-typedef QPMockDevice * CPhidgetHandle;
+class QPMockHandle;
+typedef QPMockHandle *CPhidgetHandle;
 
 /**
  * A Phidget Manager handle.
@@ -66,9 +63,9 @@ typedef QPMockDevice * CPhidgetHandle;
 class QPMock;
 typedef QPMock *CPhidgetManagerHandle;
 
+// Typedef to phidget handle type
+typedef QPMockHandle * CPhidgetInterfaceKitHandle;
 
-class QPMock888Device;
-typedef QPMock888Device *CPhidgetInterfaceKitHandle;
 
 // Callback types
 
@@ -108,5 +105,7 @@ int CPhidgetInterfaceKit_create (CPhidgetInterfaceKitHandle * phid);
 int CPhidgetInterfaceKit_setOutputState (CPhidgetInterfaceKitHandle phid, int index, int outputState);
 int CPhidgetInterfaceKit_set_OnInputChange_Handler (CPhidgetInterfaceKitHandle phid, int (* fptr) (CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState),
                                 void *userPtr);
+int CPhidgetInterfaceKit_set_OnOutputChange_Handler(CPhidgetInterfaceKitHandle phid, int ( *fptr)(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int outputState), void *userPtr);
+
 
 #endif // PHIDGET21_H

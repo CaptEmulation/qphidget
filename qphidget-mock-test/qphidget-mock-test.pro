@@ -29,11 +29,7 @@ win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidg
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mockd
 else:unix: LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mock
 
-INCLUDEPATH += $$PWD/../qphidget-mock/src
+INCLUDEPATH += $$PWD/../qphidget-mock/src\
+    $$PWD/../qphidget-lib/src
 DEPENDPATH += $$PWD/../qphidget-mock
 
-#QPhidget library will be rebuilt from sources linked against the test mock library
-
-INCLUDEPATH += $$PWD/../qphidget-lib/src
-HEADERS += $$PWD/../qphidget-lib/src/*.h
-SOURCES += $$PWD/../qphidget-lib/src/*.cpp

@@ -1,0 +1,3 @@
+module com.captemulation.qphidget.mock
+plugin qphidget-mock-qml
+

@@ -1,6 +1,7 @@
 #include <QString>
 #include <QtTest>
 #include <QVariantMap>
+#include <qmath.h>
 #include <QBitArray>
 
 #include "QPMock.h"
@@ -9,6 +10,7 @@
 #include "QPMockDataBehavior.h"
 #include "QPMock888Device.h"
 #include "QP888Device.h"
+#include "QPMockFactory.h"
 
 class QPhidgetMockTest : public QObject
 {
@@ -22,7 +24,9 @@ public:
 
 private Q_SLOTS:
     void initTestCase() {
-
+        QPMockFactory *factory = new QPMockFactory();
+        factory->create();
+        mMock = QPMock::getSingleton();
     }
 
     void cleanupTestCase() {
@@ -64,8 +68,8 @@ private Q_SLOTS:
         QFETCH(qint32, ticks);
         QScopedPointer<QPMockBehavior> behavior(new QPMockBehavior);
         QScopedPointer<QPMockDataBehavior> dataBehavior(new QPMockDataBehavior);
-        QScopedPointer<QPMock888Device> mockDevice(new QPMock888Device);
-        dataBehavior->setDevice(mockDevice.data());
+        QPMock888Device *mockDevice = new QPMock888Device;
+        dataBehavior->setDevice(mockDevice);
         dataBehavior->setData(data);
         behavior->addBehavior(dataBehavior.data());
         behavior->setTickMs(1000);
@@ -104,18 +108,29 @@ private Q_SLOTS:
         QTest::addColumn<QVariantMap>("data");
         QTest::addColumn<QBitArray>("expected");
         QTest::addColumn<qint32>("ticks");
-        QVariantMap single;
-        single["time"] = 1000;
-        single["digital"] = setDevice888Data(state1);
-        QVariantMap many;
-        many["time"] = 100000;
-        many["digital"] = setDevice888Data(state2);
-        QTest::newRow("Single tick") << single << device888Results(state1) << 1;
-        QTest::newRow("Many ticks") << many << device888Results(state2) << 100;
+        QVariantMap singleMap;
+        singleMap["time"] = 1000;
+        singleMap["digital"] = setDevice888Data(state1);
+        QVariantMap manyMap;
+        manyMap["time"] = 100000;
+        manyMap["digital"] = setDevice888Data(state2);
+        QVariantMap setByString;
+        setByString["time"] = 1000;
+        setByString["digital"] = "10101010";
+        QTest::newRow("Single tick") << singleMap << device888Results(state1) << 1;
+        QTest::newRow("Many ticks") << manyMap << device888Results(state2) << 100;
+        QTest::newRow("Set by string") << setByString << device888Results(state1) << 1;
+    }
+
+    void testDeviceId() {
+        qint32 deviceId = rand() % 99999;
+        QScopedPointer<QPMock888Device> mockDevice(new QPMock888Device());
+        mockDevice->setId(deviceId);
+        QCOMPARE(mockDevice->id(), deviceId);
     }
 
 private:
-    QPMock mock;
+    QPMock *mMock;
 };
 
 QPhidgetMockTest::QPhidgetMockTest()

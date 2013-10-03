@@ -31,14 +31,19 @@ class QPMock888Device : public QPMockDevice
 {
     Q_OBJECT
 public:
-    explicit QPMock888Device(QObject *parent = 0);
+    explicit QPMock888Device(qint32 id = -1, QObject *parent = 0);
     ~QPMock888Device();
     
-    int setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr);
+    int setOnInputChange(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr);
+    int setOnOutputChange(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr);
+    bool input(int index);
     int setInput(int index, bool input);
+    bool output(int index);
     int setOutput(int index, bool output);
 signals:
     
+    void inputChanged(int index, bool state);
+    void outputChanged(int index, bool state);
 public slots:
     
 
@@ -48,5 +53,7 @@ protected:
 private:
     QScopedPointer<QPMock888DevicePrivate> p;
 };
+
+Q_DECLARE_METATYPE(QPMock888Device *)
 
 #endif // QPMOCK888DEVICE_H

@@ -49,6 +49,16 @@ bool QP888DeviceItem::output0()
     return p->mDevice->outputs().at(0)->state();
 }
 
+void QP888DeviceItem::setInput0(bool state)
+{
+
+}
+
+void QP888DeviceItem::setInput1(bool state)
+{
+
+}
+
 void QP888DeviceItem::setOutput0(bool state)
 {
     p->mDevice->outputs().at(0)->setState(state);

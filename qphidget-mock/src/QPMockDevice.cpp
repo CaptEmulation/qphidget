@@ -20,11 +20,14 @@ limitations under the License.
 class QPMockDevicePrivate
 {
 public:
-    QPMockDevice *self;
+    CPhidgetHandle mHandle;
+    qint32 mId;
+    bool mAttached;
     QVariantMap mData;
     CPhidget_DeviceClass mDeviceClass;
-    QList<QPMockDevice::ConnectEvent> mAttachListeners;
-    QList<QPMockDevice::ConnectEvent> mDetachListeners;
+    QList<IMockDevice::ConnectEvent> mAttachListeners;
+    QList<IMockDevice::ConnectEvent> mDetachListeners;
+    QPMockDevice *self;
 
     QVariantMap data() {
         return mData;
@@ -37,34 +40,72 @@ public:
         }
     }
 
-    void setAttachListener(QPMockDevice::ConnectEvent callback) {
+    qint32 id() {
+        return mId;
+    }
+
+    void setId(qint32 id) {
+        if (mId != id) {
+            mId = id;
+            emit self->idChanged(id);
+        }
+    }
+
+    void setAttachListener(IMockDevice::ConnectEvent callback) {
         mAttachListeners.append(callback);
     }
 
-    void setDetachListener(QPMockDevice::ConnectEvent callback) {
+    void setDetachListener(IMockDevice::ConnectEvent callback) {
         mDetachListeners.append(callback);
     }
 
+    QList<IMockDevice::ConnectEvent> attachHandlers() {
+        return mAttachListeners;
+    }
+
+    void setAttachHandlers(QList<IMockDevice::ConnectEvent> attachHandlers) {
+        mAttachListeners = attachHandlers;
+    }
+
+    QList<IMockDevice::ConnectEvent> detachHandlers() {
+        return mDetachListeners;
+    }
+
+    void setDetachHandlers(QList<IMockDevice::ConnectEvent> detachHandlers) {
+        mDetachListeners = detachHandlers;
+    }
+
     void attach() {
-        QPMock::singleton->attached(self);
+        mAttached = true;
+        notifyAttached();
+    }
+
+    void notifyAttached() {
+        mHandle = QPMock::getSingleton()->attached(self);
         foreach(QPMockDevice::ConnectEvent e, mAttachListeners) {
-            e.fptr(self, e.userPtr);
+            e.fptr(mHandle, e.userPtr);
         }
     }
 
     void detach() {
-        // TODO detach from manager
+        mAttached = false;
+    }
+
+    void notifyDetached() {
         foreach(QPMockDevice::ConnectEvent e, mDetachListeners) {
-            e.fptr(self, e.userPtr);
+            e.fptr(mHandle, e.userPtr);
         }
     }
 };
 
 QPMockDevice::QPMockDevice(QObject *parent) :
     QObject(parent),
+    IMockDevice(),
     p(new QPMockDevicePrivate)
 {
     p->self = this;
+    p->mAttached = false;
+    p->mId = -1;
     QObject::connect(this, SIGNAL(dataChanged(QVariantMap)), this, SLOT(doSetData(QVariantMap)));
 }
 
@@ -77,12 +118,22 @@ void QPMockDevice::attach()
     p->attach();
 }
 
+bool QPMockDevice::isAttached()
+{
+    return p->mAttached;
+}
+
 void QPMockDevice::detach()
 {
     p->detach();
 }
 
-CPhidget_DeviceClass QPMockDevice::deviceClass()
+qint32 QPMockDevice::id() const
+{
+    return p->id();
+}
+
+CPhidget_DeviceClass QPMockDevice::deviceClass() const
 {
     return p->mDeviceClass;
 }
@@ -108,6 +159,36 @@ void QPMockDevice::setDetachListener(int (*fptr)(CPhidgetHandle, void *), void *
     p->setDetachListener(callback);
 }
 
+void QPMockDevice::notifyAttached()
+{
+    p->notifyAttached();
+}
+
+void QPMockDevice::notifyDetached()
+{
+    p->notifyDetached();
+}
+
+QList<IMockDevice::ConnectEvent> QPMockDevice::attachHandlers()
+{
+    return p->attachHandlers();
+}
+
+void QPMockDevice::setAttachHandlers(QList<IMockDevice::ConnectEvent> attachHandlers)
+{
+    p->setAttachHandlers(attachHandlers);
+}
+
+QList<IMockDevice::ConnectEvent> QPMockDevice::detachHandlers()
+{
+    return p->detachHandlers();
+}
+
+void QPMockDevice::setDetachHandlers(QList<IMockDevice::ConnectEvent> detachHandlers)
+{
+    p->setDetachHandlers(detachHandlers);
+}
+
 QVariantMap QPMockDevice::data()
 {
     return p->data();
@@ -116,5 +197,10 @@ QVariantMap QPMockDevice::data()
 void QPMockDevice::setData(QVariantMap data)
 {
     p->setData(data);
+}
+
+void QPMockDevice::setId(qint32 id)
+{
+    p->setId(id);
 }
 

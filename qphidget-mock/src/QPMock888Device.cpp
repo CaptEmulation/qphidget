@@ -17,9 +17,11 @@ limitations under the License.
 #include "QPMock888Device.h"
 #include "QPMock.h"
 
+#include <QBitArray>
 #include <QVariant>
 
-struct InputCallback {
+struct IOCallback {
+    CPhidgetInterfaceKitHandle phid;
     int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int);
     void *userPtr;
 };
@@ -28,47 +30,67 @@ class QPMock888DevicePrivate
 {
 public:
     QPMock888Device *self;
-    QList<InputCallback> mInputHandlers;
+    QList<IOCallback> mInputHandlers;
+    QList<IOCallback> mOutputHandlers;
 
-    quint8 mInput;
-    quint8 mOutput;
+    QBitArray mInput;
+    QBitArray mOutput;
 
-    void setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
+    void initialize() {
+        mInput = QBitArray(8);
+        mOutput = QBitArray(8);;
+        self->setDeviceClass(PHIDCLASS_INTERFACEKIT);
+        QPMock::getSingleton()->appendMock(self);
+    }
+
+    void setOnInputChange(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
     {
-        InputCallback callback;
+        IOCallback callback;
+        callback.phid = phid;
         callback.fptr = fptr;
         callback.userPtr = userPtr;
         mInputHandlers.append(callback);
     }
 
-    void initialize() {
-        mInput = 0;
-        mOutput = 0;
-        self->setDeviceClass(PHIDCLASS_INTERFACEKIT);
-        QPMock::singleton->appendMock(self);
+    void setOnOutputChange(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
+    {
+        IOCallback callback;
+        callback.fptr = fptr;
+        callback.phid = phid;
+        callback.userPtr = userPtr;
+        mOutputHandlers.append(callback);
+    }
+
+    bool input(int index) {
+        return mInput.at(index);
     }
 
     int setInput(int index, bool input) {
-        if (input) {
-            mInput |= input << index;
-        } else {
-            mInput &= input << index;
+        mInput.setBit(index, input);
+
+        foreach(IOCallback c, mInputHandlers) {
+            c.fptr(c.phid, c.userPtr, index, input);
         }
 
-        foreach(InputCallback c, mInputHandlers) {
-            c.fptr(self, c.userPtr, index, input);
-        }
+        emit self->inputChanged(index, input);
+
         return 0;
     }
 
+    bool output(int index) {
+        return mOutput.at(index);
+    }
+
+
     int setOutput(int index, bool output) {
-        if (output) {
-            mOutput |= output << index;
-        } else {
-            mOutput &= output << index;
+        mOutput.setBit(index, output);
+
+        foreach(IOCallback c, mOutputHandlers) {
+            c.fptr(c.phid, c.userPtr, index, output);
         }
 
-        // TODO: create and notify listeners
+        emit self->outputChanged(index, output);
+
         return 0;
     }
 
@@ -82,15 +104,28 @@ public:
                      setInput(i, inputMap.value(key).toBool());
                  }
              }
+        } else if(vInput.canConvert(QVariant::String)) {
+            QString inputs = vInput.toString();
+            for(int i = 0; i < NUM_OF_PORTS; i++) {
+                if (inputs.length() > i) {
+                    QChar input = inputs.at(i);
+                    if(input == '1') {
+                        setInput(i, true);
+                    } else if(input == '0') {
+                        setInput(i, false);
+                    }
+                }
+            }
         }
     }
 };
 
-QPMock888Device::QPMock888Device(QObject *parent) :
+QPMock888Device::QPMock888Device(qint32 id, QObject *parent)   :
     QPMockDevice(parent),
     p(new QPMock888DevicePrivate)
 {
     p->self = this;
+    setId(id);;
     p->initialize();
 }
 
@@ -98,16 +133,32 @@ QPMock888Device::~QPMock888Device()
 {
 }
 
-int QPMock888Device::setOnInputChange(int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
+int QPMock888Device::setOnInputChange(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
 {
-    p->setOnInputChange(fptr, userPtr);
+    p->setOnInputChange(phid, fptr, userPtr);
     return 0;
 
+}
+
+int QPMock888Device::setOnOutputChange(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
+{
+    p->setOnOutputChange(phid, fptr, userPtr);
+    return 0;
+}
+
+bool QPMock888Device::input(int index)
+{
+    return p->input(index);
 }
 
 int QPMock888Device::setInput(int index, bool input)
 {
     return p->setInput(index, input);
+}
+
+bool QPMock888Device::output(int index)
+{
+    return p->output(index);
 }
 
 int QPMock888Device::setOutput(int index, bool output)

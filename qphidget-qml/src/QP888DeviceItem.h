@@ -11,8 +11,8 @@ class QP888DeviceItem : public QQuickItem
 
     Q_OBJECT
     Q_PROPERTY(bool connected READ connected NOTIFY connectedChanged)
-    Q_PROPERTY(bool input0 READ input0 NOTIFY input0Changed)
-    Q_PROPERTY(bool input1 READ input1 NOTIFY input1Changed)
+    Q_PROPERTY(bool input0 READ input0 WRITE setInput0 NOTIFY input0Changed)
+    Q_PROPERTY(bool input1 READ input1 WRITE setInput1 NOTIFY input1Changed)
     Q_PROPERTY(bool output0 READ output0 WRITE setOutput0 NOTIFY output0Changed)
 
 public:
@@ -33,6 +33,8 @@ signals:
     void output0Changed(bool state);
 
 public slots:
+    void setInput0(bool state);
+    void setInput1(bool state);
     void setOutput0(bool state);
 
 private:

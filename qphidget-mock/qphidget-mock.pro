@@ -21,7 +21,12 @@ SOURCES += \
     src/QPMockBehavior.cpp \
     src/QPMockUpdateContext.cpp \
     src/QPMockDataBehavior.cpp \
-    src/QPMockUpdateDelegate.cpp
+    src/QPMockUpdateDelegate.cpp \
+    src/QPMockBehaviorFactory.cpp \
+    src/QPMockFactory.cpp \
+    src/IMockDevice.cpp \
+    src/UnattachedMockDevice.cpp \
+    src/QPMockHandle.cpp
 
 HEADERS +=\
         qphidget-mock_global.h \
@@ -32,7 +37,13 @@ HEADERS +=\
     src/QPMockBehavior.h \
     src/QPMockUpdateContext.h \
     src/QPMockDataBehavior.h \
-    src/QPMockUpdateDelegate.h
+    src/QPMockUpdateDelegate.h \
+    src/QPMockBehaviorFactory.h \
+    src/QPMockFactory.h \
+    src/IMockDevice.h \
+    src/phidget21_types.h \
+    src/UnattachedMockDevice.h \
+    src/QPMockHandle.h
 
 unix:!symbian {
     maemo5 {
@@ -43,11 +54,8 @@ unix:!symbian {
     INSTALLS += target
 }
 
-# qphidget-lib
+#QPhidget library will be rebuilt from sources linked against the test mock library
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-lib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-libd
-else:unix: LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-lib
-
-INCLUDEPATH += $$PWD/../qphidget-lib
-DEPENDPATH += $$PWD/../qphidget-lib
+INCLUDEPATH += $$PWD/../qphidget-lib/src
+HEADERS += $$PWD/../qphidget-lib/src/*.h
+SOURCES += $$PWD/../qphidget-lib/src/*.cpp

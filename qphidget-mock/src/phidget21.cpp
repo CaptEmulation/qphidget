@@ -18,19 +18,28 @@ limitations under the License.
 #include "phidget21.h"
 #include "QPMock.h"
 #include "QPMockDevice.h"
+#include "QPMockHandle.h"
 #include "QPMock888Device.h"
 
 #include <QMap>
+#include <QSharedPointer>
 
 
 int CPhidget_open(CPhidgetHandle phid, int serialNumber)
 {
+    QSharedPointer<QPMockDevice> device = (**phid).dynamicCast<QPMockDevice>();
+    if (!device.isNull()) {
+       device->notifyAttached();
+    }
     return 0;
 }
 
 int CPhidget_close(CPhidgetHandle phid)
 {
-    // do nothing
+    QSharedPointer<QPMockDevice> device = (**phid).dynamicCast<QPMockDevice>();
+    if (!device.isNull()) {
+       device->notifyDetached();
+    }
     return 0;
 }
 
@@ -46,22 +55,22 @@ int CPhidget_delete(CPhidgetHandle phid)
 // Sets connected to true for further asserts
 int CPhidgetManager_create(CPhidgetManagerHandle *phidm)
 {
-    QPMock::singleton->setConnected(true);
+    QPMock::getSingleton()->setConnected(true);
     return 0;
 }
 
 // Asserts we are connected
 int CPhidgetManager_open(CPhidgetManagerHandle phidm)
 {
-    Q_ASSERT(QPMock::singleton->isConnected());
+    Q_ASSERT(QPMock::getSingleton()->isConnected());
     return 0;
 }
 
 // Asserts we are connected
 int CPhidgetManager_close(CPhidgetManagerHandle phidm)
 {
-    Q_ASSERT(QPMock::singleton->isConnected());
-    QPMock::singleton->setConnected(false);
+    Q_ASSERT(QPMock::getSingleton()->isConnected());
+    QPMock::getSingleton()->setConnected(false);
     return 0;
 }
 
@@ -69,25 +78,25 @@ int CPhidgetManager_close(CPhidgetManagerHandle phidm)
 int CPhidgetManager_delete(CPhidgetManagerHandle phidm)
 {
     // Force code to close connections before deleting
-     Q_ASSERT(!QPMock::singleton->isConnected());
+     Q_ASSERT(!QPMock::getSingleton()->isConnected());
     return 0;
 }
 
 // Stores for later reuse
 int CPhidgetManager_set_OnAttach_Handler(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
 {
-    return QPMock::singleton->appendAttachListener(phidm, fptr, userPtr);
+    return QPMock::getSingleton()->appendAttachListener(phidm, fptr, userPtr);
 }
 
 // Stores for later reuse
 int CPhidgetManager_set_OnDetach_Handler(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
 {
-    return QPMock::singleton->appendDetachListener(phidm, fptr, userPtr);
+    return QPMock::getSingleton()->appendDetachListener(phidm, fptr, userPtr);
 }
 
 int CPhidgetManager_getAttachedDevices(CPhidgetManagerHandle phidm, CPhidgetHandle *phidArray[], int *count)
 {
-    return QPMock::singleton->getAttachedDevices(phidm, phidArray, count);
+    return QPMock::getSingleton()->getAttachedDevices(phidm, phidArray, count);
 }
 
 
@@ -100,7 +109,7 @@ int CPhidgetManager_freeAttachedDevicesArray(CPhidgetHandle phidArray[])
 // Stores for later reuse
 int CPhidgetManager_set_OnError_Handler(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetManagerHandle, void *, int, const char *), void *userPtr)
 {
-    QPMock::singleton->appendErrorListener(phidm, fptr, userPtr);
+    QPMock::getSingleton()->appendErrorListener(phidm, fptr, userPtr);
     return 0;
 }
 
@@ -113,41 +122,69 @@ int CPhidget_enableLogging(CPhidgetLog_level level, const char *outputFile)
 
 int CPhidget_getDeviceClass(CPhidgetHandle phid, CPhidget_DeviceClass *deviceClass)
 {
-    *deviceClass = phid->deviceClass();
-    return 0;
+    QSharedPointer<IMockDevice> device = **phid;
+    if (device) {
+        *deviceClass = device->deviceClass();
+        return 0;
+    }
+    return 1;
 }
 
 
 int CPhidgetInterfaceKit_create(CPhidgetInterfaceKitHandle *phid)
 {
-    *phid = (CPhidgetInterfaceKitHandle)QPMock::singleton->getMockOfClass(PHIDCLASS_INTERFACEKIT);
+    *phid = (CPhidgetInterfaceKitHandle)QPMock::getSingleton()->getMockOfClass(PHIDCLASS_INTERFACEKIT);
     return 0;
 }
 
 
 int CPhidgetInterfaceKit_set_OnInputChange_Handler(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
 {
-    phid->setOnInputChange(fptr, userPtr);
-    return 0;
+
+    QSharedPointer<QPMock888Device> ifkDevice = (**phid).dynamicCast<QPMock888Device>();
+    if (ifkDevice) {
+        ifkDevice->setOnInputChange(phid, fptr, userPtr);
+        return 0;
+    }
+    return 1;
 }
 
+int CPhidgetInterfaceKit_set_OnOutputChange_Handler(CPhidgetInterfaceKitHandle phid, int ( *fptr)(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int outputState), void *userPtr)
+{
+    QSharedPointer<QPMock888Device> ifkDevice = (**phid).dynamicCast<QPMock888Device>();
+    if (ifkDevice) {
+        ifkDevice->setOnOutputChange(phid, fptr, userPtr);
+        return 0;
+    }
+    return 1;
+}
 
 int CPhidgetInterfaceKit_setOutputState(CPhidgetInterfaceKitHandle phid, int index, int outputState)
 {
-    return phid->setOutput(index, outputState);
+    QSharedPointer<QPMock888Device> ifkDevice = (**phid).dynamicCast<QPMock888Device>();
+    if (ifkDevice) {
+        return ifkDevice->setOutput(index, outputState);
+    }
+    return 1;
 }
-
 
 int CPhidget_set_OnDetach_Handler(CPhidgetHandle phid, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
 {
-
-    phid->setDetachListener(fptr, userPtr);
-    return 0;
+    QSharedPointer<QPMockDevice> device = (**phid).dynamicCast<QPMock888Device>();
+    if (device) {
+        device->setDetachListener(fptr, userPtr);
+        return 0;
+    }
+    return 1;
 }
 
 
 int CPhidget_set_OnAttach_Handler(CPhidgetHandle phid, int (*fptr)(CPhidgetHandle, void *), void *userPtr)
 {
-    phid->setAttachListener(fptr, userPtr);
-    return 0;
+    QSharedPointer<QPMockDevice> device = (**phid).dynamicCast<QPMockDevice>();;
+    if (device) {
+        device->setAttachListener(fptr, userPtr);
+        return 0;
+    }
+    return 1;
 }

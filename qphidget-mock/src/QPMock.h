@@ -20,6 +20,7 @@ limitations under the License.
 
 #include <QObject>
 #include "phidget21.h"
+#include "QPMockDevice.h"
 
 class QPMockPrivate;
 /**
@@ -31,18 +32,17 @@ class QPMock : public QObject
 public:
     explicit QPMock(QObject *parent = 0);
     ~QPMock();
-    // Global static singleton (easiest way to access from C-style proxy library
-    static QPMock *singleton;
 
     // Test Mock API
     void reset();
     QList<CPhidgetHandle> mocks();
-    void appendMock(CPhidgetHandle device);
-    CPhidgetHandle getMockOfClass(CPhidget_DeviceClass deviceClass);
+    void appendMock(IMockDevice *mock);
+    void removeMock(IMockDevice *mock);
+    CPhidgetHandle getMockOfClass(CPhidget_DeviceClass deviceClass, qint32 id = -1);
 
     bool isConnected();
     void setConnected(bool connected);
-    void attached(CPhidgetHandle device);
+    CPhidgetHandle attached(IMockDevice *device);
 
     // Returns a QPMock888Device
     QPMockDevice *mockInterfaceKey();
@@ -53,6 +53,8 @@ public:
     int appendErrorListener(CPhidgetManagerHandle phidm, int (*fptr)(CPhidgetManagerHandle, void *, int, const char *), void *userPtr);
     int getAttachedDevices(CPhidgetManagerHandle phidm, CPhidgetHandle *phidArray[], int *count);
 
+    // Global static singleton (easiest way to access from C-style proxy library
+    static QPMock *getSingleton();
 signals:
 
 public slots:

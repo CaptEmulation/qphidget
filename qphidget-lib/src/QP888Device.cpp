@@ -17,6 +17,7 @@ limitations under the License.
 #include "QP888Device.h"
 
 int inputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState);
+int outputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState);
 int attachHandler(CPhidgetHandle phid, void *userPtr);
 int detachHandler(CPhidgetHandle phid, void *userPtr);
 
@@ -32,8 +33,9 @@ public:
     QList<QPDigitalIO *> mOutputs;
 
     void initialize() {
-        mPhidget = Q_NULLPTR;
         mConnected = false;
+        mPhidget = Q_NULLPTR;
+        mIfkPhidget = Q_NULLPTR;
 
         // Initialize individual IO objects
         for(int i = 0; i < 8; i++) {
@@ -46,13 +48,14 @@ public:
     void open() {
         int err = CPhidgetInterfaceKit_create(&mIfkPhidget);
 
-        if (mPhidget == Q_NULLPTR) {
+        if (mIfkPhidget) {
             setPhidget((CPhidgetHandle)mIfkPhidget);
         }
 
         err = CPhidget_set_OnAttach_Handler((CPhidgetHandle)mIfkPhidget, attachHandler, this);
         err = CPhidget_set_OnDetach_Handler((CPhidgetHandle)mIfkPhidget, detachHandler, this);
         err = CPhidgetInterfaceKit_set_OnInputChange_Handler(mIfkPhidget, inputHandler, this);
+        err = CPhidgetInterfaceKit_set_OnOutputChange_Handler(mIfkPhidget, outputHandler, this);
         err = CPhidget_open((CPhidgetHandle)mIfkPhidget, -1);
         mOpen = !err;
     }
@@ -72,7 +75,7 @@ public:
         if (connected != mConnected) {
             mConnected = connected;
             if (connected) {
-                // Inform output digits about IFk handler so that they can post there changes
+                // Inform output digits about IFk handler so that they can post their changes
                 foreach(QPDigitalIO *output, mOutputs) {
                     output->setIfk(mIfkPhidget);
                 }
@@ -109,6 +112,7 @@ QP888Device::QP888Device(QObject *parent) :
 
 QP888Device::~QP888Device()
 {
+    CPhidget_close(p->mPhidget);
     CPhidget_close((CPhidgetHandle)p->mIfkPhidget);
     CPhidget_delete((CPhidgetHandle)p->mIfkPhidget);
 }
@@ -168,6 +172,12 @@ void QP888Device::setPhidget(CPhidgetHandle phidget)
 int inputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState) {
     QP888DevicePrivate *instance = (QP888DevicePrivate *)userPtr;
     instance->setInput(index, inputState);
+    return 0;
+}
+
+int outputHandler(CPhidgetInterfaceKitHandle phid, void *userPtr, int index, int inputState) {
+    QP888DevicePrivate *instance = (QP888DevicePrivate *)userPtr;
+    instance->setOutput(index, inputState);
     return 0;
 }
 
