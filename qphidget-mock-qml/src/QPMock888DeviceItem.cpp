@@ -32,7 +32,24 @@ public:
         case 1:
             emit self->input1Changed(input);
             break;
-
+        case 2:
+            emit self->input2Changed(input);
+            break;
+        case 3:
+            emit self->input3Changed(input);
+            break;
+        case 4:
+            emit self->input4Changed(input);
+            break;
+        case 5:
+            emit self->input5Changed(input);
+            break;
+        case 6:
+            emit self->input6Changed(input);
+            break;
+        case 7:
+            emit self->input7Changed(input);
+            break;
         }
     }
 
@@ -43,6 +60,24 @@ public:
             break;
         case 1:
             emit self->output1Changed(output);
+            break;
+        case 2:
+            emit self->output2Changed(output);
+            break;
+        case 3:
+            emit self->output3Changed(output);
+            break;
+        case 4:
+            emit self->output4Changed(output);
+            break;
+        case 5:
+            emit self->output5Changed(output);
+            break;
+        case 6:
+            emit self->output6Changed(output);
+            break;
+        case 7:
+            emit self->output7Changed(output);
             break;
 
         }
@@ -76,19 +111,80 @@ bool QPMock888DeviceItem::input0()
     return p->mDevice->input(0);
 }
 
-void QPMock888DeviceItem::setInput0(bool state)
-{
-    p->mDevice->setInput(0, state);
-}
-
 bool QPMock888DeviceItem::input1()
 {
     return p->mDevice->input(1);
 }
 
+bool QPMock888DeviceItem::input2()
+{
+    return p->mDevice->input(2);
+}
+
+bool QPMock888DeviceItem::input3()
+{
+    return p->mDevice->input(3);
+}
+
+bool QPMock888DeviceItem::input4()
+{
+    return p->mDevice->input(4);
+}
+
+bool QPMock888DeviceItem::input5()
+{
+    return p->mDevice->input(5);
+}
+
+bool QPMock888DeviceItem::input6()
+{
+    return p->mDevice->input(6);
+}
+
+bool QPMock888DeviceItem::input7()
+{
+    return p->mDevice->input(7);
+}
+
+void QPMock888DeviceItem::setInput0(bool state)
+{
+    p->mDevice->setInput(0, state);
+}
+
+
 void QPMock888DeviceItem::setInput1(bool state)
 {
     p->mDevice->setInput(1, state);
+}
+
+void QPMock888DeviceItem::setInput2(bool state)
+{
+    p->mDevice->setInput(2, state);
+}
+
+void QPMock888DeviceItem::setInput3(bool state)
+{
+    p->mDevice->setInput(3, state);
+}
+
+void QPMock888DeviceItem::setInput4(bool state)
+{
+    p->mDevice->setInput(4, state);
+}
+
+void QPMock888DeviceItem::setInput5(bool state)
+{
+    p->mDevice->setInput(5, state);
+}
+
+void QPMock888DeviceItem::setInput6(bool state)
+{
+    p->mDevice->setInput(6, state);
+}
+
+void QPMock888DeviceItem::setInput7(bool state)
+{
+    p->mDevice->setInput(7, state);
 }
 
 void QPMock888DeviceItem::inputChanged(int index, bool input)
@@ -109,6 +205,36 @@ bool QPMock888DeviceItem::output0()
 bool QPMock888DeviceItem::output1()
 {
     return p->mDevice->output(1);
+}
+
+bool QPMock888DeviceItem::output2()
+{
+    return p->mDevice->output(2);
+}
+
+bool QPMock888DeviceItem::output3()
+{
+    return p->mDevice->output(3);
+}
+
+bool QPMock888DeviceItem::output4()
+{
+    return p->mDevice->output(4);
+}
+
+bool QPMock888DeviceItem::output5()
+{
+    return p->mDevice->output(5);
+}
+
+bool QPMock888DeviceItem::output6()
+{
+    return p->mDevice->output(6);
+}
+
+bool QPMock888DeviceItem::output7()
+{
+    return p->mDevice->output(7);
 }
 
 void QPMock888DeviceItem::setUid(quint32 uid)

@@ -18,7 +18,21 @@ Rectangle {
         }
 
         onOutput0Changed: do0.state = boolToState(output0)
+        onOutput1Changed: do1.state = boolToState(output1)
+        onOutput2Changed: do2.state = boolToState(output2)
+        onOutput3Changed: do3.state = boolToState(output3)
+        onOutput4Changed: do4.state = boolToState(output4)
+        onOutput5Changed: do5.state = boolToState(output5)
+        onOutput6Changed: do6.state = boolToState(output6)
+        onOutput7Changed: do7.state = boolToState(output7)
         onInput0Changed: di0.state = boolToState(input0)
+        onInput1Changed: di1.state = boolToState(input1)
+        onInput2Changed: di2.state = boolToState(input2)
+        onInput3Changed: di3.state = boolToState(input3)
+        onInput4Changed: di4.state = boolToState(input4)
+        onInput5Changed: di5.state = boolToState(input5)
+        onInput6Changed: di6.state = boolToState(input6)
+        onInput7Changed: di7.state = boolToState(input7)
     }
 
     Text {
