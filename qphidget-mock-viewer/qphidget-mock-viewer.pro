@@ -61,4 +61,9 @@ HEADERS += $$PWD/../qphidget-lib/src/*.h
 SOURCES += $$PWD/../qphidget-lib/src/*.cpp
 
 OTHER_FILES += \
-    qml/qphidget-mock-viewer/DigitalOutput.qml
+    ../qml/DigitalOutput.qml \
+    ../qml/DigitalInput.qml \
+    ../qml/DigitalOutput.qml \
+    ../qml/IOBox.qml \
+    ../qml/Ifk888Tester.qml \
+    ../qml/MockIFK888.qml
