@@ -25,11 +25,9 @@ DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 # qphidget-mock
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mock
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mockd
-else:unix: LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mock
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../lib/qphidget-mock/ -lqphidget-mock
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../lib/qphidget-mock/ -lqphidget-mockd
+else:unix: LIBS += -L$$PWD/../lib/qphidget-mock/ -lqphidget-mock
 
-INCLUDEPATH += $$PWD/../qphidget-mock/src\
-    $$PWD/../qphidget-lib/src
-DEPENDPATH += $$PWD/../qphidget-mock
-
+INCLUDEPATH += $$PWD/../include/qphidget-mock
+DEPENDPATH += $$PWD/../include/qphidget-mock

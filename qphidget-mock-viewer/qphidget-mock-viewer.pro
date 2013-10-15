@@ -14,6 +14,15 @@ QML_IMPORT_PATH =
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp
 
+
+OTHER_FILES += \
+    ../qml/DigitalOutput.qml \
+    ../qml/DigitalInput.qml \
+    ../qml/DigitalOutput.qml \
+    ../qml/IOBox.qml \
+    ../qml/Ifk888Tester.qml \
+    ../qml/MockIFK888.qml
+
 # Installation path
 # target.path =
 
@@ -23,47 +32,32 @@ qtcAddDeployment()
 
 # qphidget-mock-qml
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-mock-qml/ -lqphidget-mock-qml
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-mock-qml/ -lqphidget-mock-qmld
-else:unix: LIBS += -L$$PWD/../qphidget-mock-qml -lqphidget-mock-qml
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../lib/qphidget-mock-qml/ -lqphidget-mock-qml
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../lib/qphidget-mock-qml/ -lqphidget-mock-qmld
+else:unix: LIBS += -L$$PWD/../lib/qphidget-mock-qml/ -lqphidget-mock-qml
 
-INCLUDEPATH += $$PWD/../qphidget-mock-qml
-DEPENDPATH += $$PWD/../qphidget-mock-qml
+INCLUDEPATH += $$PWD/../include/qphidget-mock-qml
+DEPENDPATH += $$PWD/../include/qphidget-mock-qml
 
 # qphidget-mock
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mock
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-mock/ -lqphidget-mockd
-else:unix: LIBS += -L$$PWD/../qphidget-mock -lqphidget-mock
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../lib/qphidget-mock/ -lqphidget-mock
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../lib/qphidget-mock/ -lqphidget-mockd
+else:unix: LIBS += -L$$PWD/../lib/qphidget-mock/ -lqphidget-mock
 
-INCLUDEPATH += $$PWD/../qphidget-mock/src\
-    $$PWD/../qphidget-lib/src
-DEPENDPATH += $$PWD/../qphidget-mock
+INCLUDEPATH += $$PWD/../include/qphidget-mock
+DEPENDPATH += $$PWD/../include/qphidget-mock
 
 # qphidget-qml
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-qml/ -lqphidget-qml
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-qml/ -lqphidget-qmld
-else:unix: LIBS += -L$$PWD/../qphidget-qml/ -lqphidget-qml
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../lib/qphidget-qml -lqphidget-qml
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../lib/qphidget-qml -lqphidget-qmld
+else:unix: LIBS += -L$$PWD/../lib/qphidget-qml -lqphidget-qml
 
-INCLUDEPATH += $$PWD/../qphidget-qml
-DEPENDPATH += $$PWD/../qphidget-qml
+INCLUDEPATH += $$PWD/../include/qphidget-qml
+DEPENDPATH += $$PWD/../include/qphidget-qml
 
-win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-qml/qphidget-qml.lib
-else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-qml/qphidget-qmld.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../qphidget-qml/libqphidget-qml.a
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../lib/qphidget-qml/qphidget-qml.lib
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../lib/qphidget-qml/qphidget-qmld.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../lib/qphidget-qml/libqphidget-qml.a
 
-
-#QPhidget library will be rebuilt from sources linked against the test mock library
-
-INCLUDEPATH += $$PWD/../qphidget-lib/src
-HEADERS += $$PWD/../qphidget-lib/src/*.h
-SOURCES += $$PWD/../qphidget-lib/src/*.cpp
-
-OTHER_FILES += \
-    ../qml/DigitalOutput.qml \
-    ../qml/DigitalInput.qml \
-    ../qml/DigitalOutput.qml \
-    ../qml/IOBox.qml \
-    ../qml/Ifk888Tester.qml \
-    ../qml/MockIFK888.qml

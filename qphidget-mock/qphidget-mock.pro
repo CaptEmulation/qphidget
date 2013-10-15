@@ -4,6 +4,30 @@
 #
 #-------------------------------------------------
 
+
+###########################
+###    SETUP OUTPUT     ###
+###########################
+
+DEBUG_TARGET = qphidget-mockd
+RELEASE_TARGET = qphidget-mock
+OUTDIR = ..
+
+CONFIG(debug, debug|release){
+    TARGET = $$DEBUG_TARGET
+}
+
+CONFIG(release, debug|release){
+    TARGET = $$RELEASE_TARGET
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
+DESTDIR = $$OUTDIR/lib/$$RELEASE_TARGET
+
+###########################
+###      QT CONFIG      ###
+###########################
+
 QT       -= gui
 
 TARGET = qphidget-mock
@@ -59,3 +83,28 @@ unix:!symbian {
 INCLUDEPATH += $$PWD/../qphidget-lib/src
 HEADERS += $$PWD/../qphidget-lib/src/*.h
 SOURCES += $$PWD/../qphidget-lib/src/*.cpp
+
+
+###########################
+###       INSTALL       ###
+###########################
+
+OUTINCLUDE = $$PWD/../include
+
+win32 {
+    OUTINCLUDE ~= s,/,\\,g
+    QMAKE_POST_LINK += $$quote(if not exist $$OUTINCLUDE\\$$RELEASE_TARGET mkdir $$OUTINCLUDE\\$$RELEASE_TARGET)
+
+    for(header, HEADERS) {
+        header ~= s,/,\\,g
+        QMAKE_POST_LINK += $$quote(xcopy $$header $$OUTINCLUDE\\$$RELEASE_TARGET /y)
+    }
+}
+
+unix {
+    QMAKE_POST_LINK += $$quote(mkdir -p $$OUTINCLUDE/$$RELEASE_TARGET$$escape_expand(\\n\\t))
+
+    for(header, HEADERS) {
+       QMAKE_POST_LINK += $$quote(cp -u $$header $$OUTINCLUDE/$$RELEASE_TARGET$$escape_expand(\\n\\t))
+    }
+}

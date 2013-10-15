@@ -112,9 +112,10 @@ QP888Device::QP888Device(QObject *parent) :
 
 QP888Device::~QP888Device()
 {
-    CPhidget_close(p->mPhidget);
-    CPhidget_close((CPhidgetHandle)p->mIfkPhidget);
-    CPhidget_delete((CPhidgetHandle)p->mIfkPhidget);
+    if (p->mIfkPhidget) {
+        CPhidget_close((CPhidgetHandle)p->mIfkPhidget);
+        CPhidget_delete((CPhidgetHandle)p->mIfkPhidget);
+    }
 }
 
 void QP888Device::open()

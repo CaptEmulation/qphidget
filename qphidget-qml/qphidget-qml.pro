@@ -14,6 +14,26 @@
 #limitations under the License.
 
 
+
+###########################
+###    SETUP OUTPUT     ###
+###########################
+
+DEBUG_TARGET = qphidget-qmld
+RELEASE_TARGET = qphidget-qml
+OUTDIR = ..
+
+CONFIG(debug, debug|release){
+    TARGET = $$DEBUG_TARGET
+}
+
+CONFIG(release, debug|release){
+    TARGET = $$RELEASE_TARGET
+    DEFINES += QT_NO_DEBUG_OUTPUT
+}
+
+DESTDIR = $$OUTDIR/lib/$$RELEASE_TARGET
+
 # Phidget library
 unix: LIBS += -lphidget21
 
@@ -58,6 +78,44 @@ HEADERS += \
 
 OTHER_FILES = qmldir
 
+# qphidget-lib
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../lib/qphidget/ -lqphidget-lib
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../lib/qphidget/ -lqphidget-libd
+else:unix: LIBS += -L$$PWD/../lib/qphidget/ -lqphidget-lib
+
+INCLUDEPATH += $$PWD/../include/qphidget
+DEPENDPATH += $$PWD/../include/qphidget
+
+win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../lib/qphidget/qphidget-lib.lib
+else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../lib/qphidget/qphidget-libd.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../lib/qphidget/libqphidget-lib.a
+
+
+###########################
+###       INSTALL       ###
+###########################
+
+OUTINCLUDE = $$PWD/../include
+
+win32 {
+    OUTINCLUDE ~= s,/,\\,g
+    QMAKE_POST_LINK += $$quote(if not exist $$OUTINCLUDE\\$$RELEASE_TARGET mkdir $$OUTINCLUDE\\$$RELEASE_TARGET)
+
+    for(header, HEADERS) {
+        header ~= s,/,\\,g
+        QMAKE_POST_LINK += $$quote(xcopy $$header $$OUTINCLUDE\\$$RELEASE_TARGET /y)
+    }
+}
+
+unix {
+    QMAKE_POST_LINK += $$quote(mkdir -p $$OUTINCLUDE/$$RELEASE_TARGET$$escape_expand(\\n\\t))
+
+    for(header, HEADERS) {
+       QMAKE_POST_LINK += $$quote(cp -u $$header $$OUTINCLUDE/$$RELEASE_TARGET$$escape_expand(\\n\\t))
+    }
+}
+
 !equals(_PRO_FILE_PWD_, $$OUT_PWD) {
     copy_qmldir.target = $$OUT_PWD/qmldir
     copy_qmldir.depends = $$_PRO_FILE_PWD_/qmldir
@@ -73,15 +131,3 @@ unix {
     target.path = $$installPath
     INSTALLS += target qmldir
 }
-
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-lib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-libd
-else:unix: LIBS += -L$$PWD/../qphidget-lib/ -lqphidget-lib
-
-INCLUDEPATH += $$PWD/../qphidget-lib
-DEPENDPATH += $$PWD/../qphidget-lib
-
-win32:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-lib/qphidget-lib.lib
-else:win32:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../qphidget-lib/qphidget-libd.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../qphidget-lib/libqphidget-lib.a
