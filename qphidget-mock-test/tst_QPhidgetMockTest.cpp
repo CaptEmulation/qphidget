@@ -24,13 +24,16 @@ public:
 
 private Q_SLOTS:
     void initTestCase() {
-        QPMockFactory *factory = new QPMockFactory();
-        factory->create();
         mMock = QPMock::getSingleton();
     }
 
-    void cleanupTestCase() {
+    void init() {
+        mockDevice = new QPMock888Device(-1);
+        mMock->appendMock(mockDevice);
+    }
 
+    void cleanup() {
+        mMock->reset();
     }
 
     void testInit() {
@@ -68,15 +71,14 @@ private Q_SLOTS:
         QFETCH(qint32, ticks);
         QScopedPointer<QPMockBehavior> behavior(new QPMockBehavior);
         QScopedPointer<QPMockDataBehavior> dataBehavior(new QPMockDataBehavior);
-        QPMock888Device *mockDevice = new QPMock888Device;
         dataBehavior->setDevice(mockDevice);
         dataBehavior->setData(data);
         behavior->addBehavior(dataBehavior.data());
         behavior->setTickMs(1000);
+        mockDevice->attach();
 
         QScopedPointer<QP888Device> device(new QP888Device());
         device->open();
-        mockDevice->attach();
 
         for (int i = 0; i < ticks; i++) {
             behavior->tick();
@@ -131,6 +133,7 @@ private Q_SLOTS:
 
 private:
     QPMock *mMock;
+    QPMock888Device *mockDevice;
 };
 
 QPhidgetMockTest::QPhidgetMockTest()

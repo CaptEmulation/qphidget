@@ -40,7 +40,6 @@ public:
         mInput = QBitArray(8);
         mOutput = QBitArray(8);;
         self->setDeviceClass(PHIDCLASS_INTERFACEKIT);
-        QPMock::getSingleton()->appendMock(self);
     }
 
     void setOnInputChange(CPhidgetInterfaceKitHandle phid, int (*fptr)(CPhidgetInterfaceKitHandle, void *, int, int), void *userPtr)
